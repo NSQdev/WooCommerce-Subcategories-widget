@@ -2,10 +2,10 @@
 /*
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
-Description: 
-Version: 1.2
-Author: Dark Delphin
-Author URI: 
+Description: Shows subcategories from chosen or current active category
+Version: 1.2.1
+Author: Pavel Burov aka Dark Delphin
+Author URI: http://pavelburov.com
 */
 
 class woocom_subcats extends WP_Widget {
@@ -30,6 +30,10 @@ class woocom_subcats extends WP_Widget {
 		<p>
 		    <label for="<?php echo $this->get_field_id('title'); ?>"><?php echo __('Title: '); ?></label>
 		    <input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if(isset($title)) echo esc_attr($title) ?>"/>
+		</p>
+		<p>
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>" name="<? echo $this->get_field_name('show_subcategories_of_current_active_category'); ?>" value="1" <?php checked( '1', $show_subcategories_of_current_active_category ); ?>/>
+		    <label for="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>"><?php echo __('Show subcategories of current active category'); ?></label>
 		</p>
 		<p>
 		    <input type="checkbox" id="<? echo $this->get_field_id('show_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('show_children_of_current_subcategory'); ?>" value="1" <?php checked( '1', $show_children_of_current_subcategory ); ?>/>
@@ -126,7 +130,7 @@ class woocom_subcats extends WP_Widget {
 	echo $before_widget;
 	    echo $before_title . $title . $after_title;
 	    
-	    if(isset($catslist))
+	    if(isset($catslist) && !isset($show_subcategories_of_current_active_category))
 		{
 			$args = array(
 				'title_li'           => '',
@@ -139,6 +143,23 @@ class woocom_subcats extends WP_Widget {
 				'child_of'           => $catslist,
 				'taxonomy'           => 'product_cat'
 			);
+		}
+		elseif(isset($show_subcategories_of_current_active_category))
+		{
+			$current_tax = get_query_var('product_cat'); // slug
+			$cid = get_queried_object()->term_id;
+
+			$args = array(
+				'title_li'           => '',
+				'hierarchical'       => 1,
+				'show_option_none'   => '',
+				'echo'               => 0,
+				'depth'				 => 1,
+				'hide_empty'         => 0,
+				'parent'			 => $cid,
+				'taxonomy'           => 'product_cat'
+			);
+		}
 
 			$categories = get_categories( $args );
 			$zurb = wp_list_categories( $args );
@@ -178,7 +199,6 @@ class woocom_subcats extends WP_Widget {
 				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title);
 			}
 			echo '</ul>';
-		}
 
 	echo $after_widget;
     }

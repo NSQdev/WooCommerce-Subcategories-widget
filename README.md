@@ -2,6 +2,9 @@
 
 Plugin that allows you to list product subcategories from selected parent category.
 
+Update 1.2.1
+* Added option to output subcategories of current active category.
+
 Update 1.2:
 * Added option for categories featured images output with customizable width and height
 * Added option to choose what to output (title, image, or both)
