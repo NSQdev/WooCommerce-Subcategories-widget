@@ -12,7 +12,7 @@ Plugin that allows you to list product subcategories from selected parent catego
 wp_show_subcategories_menu( category_id_or_slug, show_subcategories_of_current_active_category , hide_children_of_current_subcategory )
 ```
 
-show_subcategories_of_current_active_category and hide_children_of_current_subcategory must be ```true``` or ```false```.
+```show_subcategories_of_current_active_category``` and ```hide_children_of_current_subcategory``` must be ```true``` or ```false```.
 
 Example (one level menu):
 
