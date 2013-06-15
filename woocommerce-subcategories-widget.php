@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
 Description: Shows subcategories from chosen or current active category
-Version: 1.2.1
+Version: 1.2.2
 Author: Pavel Burov aka Dark Delphin
 Author URI: http://pavelburov.com
 */
@@ -18,6 +18,8 @@ class woocom_subcats extends WP_Widget {
 	);
 	
 	parent::__construct('woocom_subcats', '', $params);
+
+	add_shortcode( 'wp_show_subcats', array($this, 'shortcode') );
     }
     
     function form($instance)
@@ -36,8 +38,8 @@ class woocom_subcats extends WP_Widget {
 		    <label for="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>"><?php echo __('Show subcategories of current active category'); ?></label>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('show_children_of_current_subcategory'); ?>" value="1" <?php checked( '1', $show_children_of_current_subcategory ); ?>/>
-		    <label for="<? echo $this->get_field_id('show_children_of_current_subcategory'); ?>"><?php echo __('Hide children of current subcategory'); ?></label>
+		    <input type="checkbox" id="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('hide_children_of_current_subcategory'); ?>" value="1" <?php checked( '1', $hide_children_of_current_subcategory ); ?>/>
+		    <label for="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>"><?php echo __('Hide children of current subcategory'); ?></label>
 		</p>
 		<p>
 		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( '1', $show_category_title ); ?>/>
@@ -132,6 +134,8 @@ class woocom_subcats extends WP_Widget {
 	    
 	    if(isset($catslist) && !isset($show_subcategories_of_current_active_category))
 		{
+			if(!preg_match('/[0-9]+/', $catslist)) $catslist = get_term_by( 'slug', $catslist, 'product_cat')->term_id;
+
 			$args = array(
 				'title_li'           => '',
 				'hierarchical'       => 1,
@@ -195,12 +199,23 @@ class woocom_subcats extends WP_Widget {
 				$output .= '</a></li>';
 				echo $output;
 
-				if(isset($show_children_of_current_subcategory)) continue;
+				if(isset($hide_children_of_current_subcategory)) continue;
 				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title);
 			}
 			echo '</ul>';
 
 	echo $after_widget;
+    }
+
+    function shortcode( $atts )
+    {
+    	extract( shortcode_atts( array(
+    	  'cat' => 'default',
+	      'subcategories_of_current' => false,
+	      'hide_children' => false
+     	), $atts ) );
+     	
+     	return wp_show_subcategories_menu($cat, $subcategories_of_current, $hide_children);
     }
 }
 
@@ -209,5 +224,21 @@ add_action('widgets_init', 'woocom_subcats_register_function');
 function woocom_subcats_register_function()
 {
     register_widget('woocom_subcats');
+}
+
+if(!function_exists('wp_show_subcategories_menu'))
+{
+	function wp_show_subcategories_menu( $cat, $show_subcategories_of_current_active_category = false, $hide_children_of_current_subcategory = false)
+	{
+		$submenu = new woocom_subcats();
+		$args = array(
+			'catslist' => $cat
+			);
+		if($show_subcategories_of_current_active_category == true) $args['show_subcategories_of_current_active_category'] = true;
+
+		if($hide_children_of_current_subcategory == true) $args['hide_children_of_current_subcategory'] = true;
+		
+		echo $submenu->widget($args, $instance);
+	}
 }
 ?>
