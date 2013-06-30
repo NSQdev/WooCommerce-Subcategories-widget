@@ -150,8 +150,7 @@ class woocom_subcats extends WP_Widget {
 		}
 		elseif(isset($show_subcategories_of_current_active_category))
 		{
-			$current_tax = get_query_var('product_cat'); // slug
-			$cid = get_queried_object()->term_id;
+			$isproduct = false;
 
 			$args = array(
 				'title_li'           => '',
@@ -160,13 +159,41 @@ class woocom_subcats extends WP_Widget {
 				'echo'               => 0,
 				'depth'				 => 1,
 				'hide_empty'         => 0,
-				'parent'			 => $cid,
+				// 'parent'			 => $cid,
 				'taxonomy'           => 'product_cat'
 			);
+
+			$current_tax = get_query_var('product_cat'); // slug
+
+			if(!$current_tax || $current_tax == '')
+			{
+				$terms = get_the_terms( get_the_ID(), 'product_cat' );
+				foreach ( $terms as $term ) 
+				{
+					$ids = $term->term_id;
+				}
+				$cid = $ids;
+				$isproduct = true;
+			}
+			else
+			{
+				$cid = get_queried_object()->term_id;
+				$args['parent'] = $cid;
+			}
+			
+			
 		}
 
-			$categories = get_categories( $args );
-			$zurb = wp_list_categories( $args );
+			if($isproduct)
+			{
+				$categories = get_the_terms( get_the_ID(), 'product_cat' );
+			}
+			else
+			{
+				$categories = get_categories( $args );
+			}
+			
+			// $zurb = wp_list_categories( $args );
 			// echo htmlspecialchars($zurb);
 			
 			echo '<ul class="product-categories woosubcats">';
@@ -178,6 +205,7 @@ class woocom_subcats extends WP_Widget {
 				if(isset($show_category_thumbnail))
 				{
 				$thumbnail_id = get_metadata( 'woocommerce_term', $cat->woocommerce_term_id, 'thumbnail_id', true );
+				if(!$thumbnail_id) $thumbnail_id = get_metadata( 'woocommerce_term', $cat->term_id, 'thumbnail_id', true );;
 				
 					   	if ($thumbnail_id) 
 					   	{
