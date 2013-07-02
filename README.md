@@ -2,6 +2,26 @@
 
 Plugin that allows you to list product subcategories from selected parent category.
 
+#### Update 1.2.3
+
+* Added new option to output subcategories of selected category with parent category in hierarchy (nested lists)
+
+Example ("Parent" category is selected):
+
+Before option is turned on:
+
+* Subcategory
+* Subcategory
+* Subcategory
+
+After option is turned on:
+
+* Parent
+	* Subcategory
+	* Subcategory
+	* Subcategory
+
+
 #### Update 1.2.2
 
 * Added ```wp_show_subcategories_menu``` function to output menu in template without using widget (no additional widget area needed)
@@ -41,5 +61,5 @@ Shortcode attributes:
 
 * Added option for categories featured images output with customizable width and height
 * Added option to choose what to output (title, image, or both)
-* Added hierarchical output for subcategories of selected categoty (can be collapsed with WooTweak accordion widget enhancement) 
+* Added hierarchical output for subcategories of selected category (can be collapsed with WooTweak accordion widget enhancement) 
 * Hierarchical output can be turned off

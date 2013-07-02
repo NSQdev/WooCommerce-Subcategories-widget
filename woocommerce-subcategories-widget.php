@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
 Description: Shows subcategories from chosen or current active category
-Version: 1.2.2
+Version: 1.2.3
 Author: Pavel Burov aka Dark Delphin
 Author URI: http://pavelburov.com
 */
@@ -25,6 +25,7 @@ class woocom_subcats extends WP_Widget {
     function form($instance)
     {
 	extract($instance);
+	
 	
 	
 	$taxlist = get_terms('product_cat', 'hide_empty=0');
@@ -70,6 +71,10 @@ class woocom_subcats extends WP_Widget {
 				}
 				?>
 			</select>
+		</p>
+		<p>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked( '1', $show_parent_category ); ?>/>
+	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category with subcategories hierarchy'); ?></label>
 		</p>
 	    <!--some html with input fields-->
 	<?php
@@ -196,7 +201,21 @@ class woocom_subcats extends WP_Widget {
 			// $zurb = wp_list_categories( $args );
 			// echo htmlspecialchars($zurb);
 			
-			echo '<ul class="product-categories woosubcats">';
+			if($show_parent_category)
+			{
+				echo '<ul class="product-categories woosubcats">';
+				// $link = get_term_link( $cat->slug, $cat->taxonomy );
+				$link = get_term_link( (int)$catslist, 'product_cat' );
+				$parent = get_term( (int)$catslist, 'product_cat' );
+
+				echo '<li><a href="'.$link.'">'.$parent->name.'</a></li>';
+					echo '<ul class="children">';				
+			}
+			else
+			{ 
+				echo '<ul class="product-categories woosubcats">';
+			}
+			
 			foreach($categories as $cat)
 			{
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
@@ -231,6 +250,8 @@ class woocom_subcats extends WP_Widget {
 				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title);
 			}
 			echo '</ul>';
+
+			if($show_parent_category) echo '</ul>';
 
 	echo $after_widget;
     }
