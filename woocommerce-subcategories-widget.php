@@ -132,10 +132,10 @@ class woocom_subcats extends WP_Widget {
     function widget($args, $instance)
     {
     extract($args);
-	extract($instance);
+	if($instance) extract($instance);
 	
-	echo $before_widget;
-	    echo $before_title . $title . $after_title;
+	if($instance) echo $before_widget;
+	    if($title) echo $before_title . $title . $after_title;
 	    
 	    if(isset($catslist) && !isset($show_subcategories_of_current_active_category))
 		{
@@ -253,7 +253,7 @@ class woocom_subcats extends WP_Widget {
 
 			if($show_parent_category) echo '</ul>';
 
-	echo $after_widget;
+	if($instance) echo $after_widget;
     }
 
     function shortcode( $atts )
