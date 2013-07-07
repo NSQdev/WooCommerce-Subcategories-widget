@@ -132,10 +132,13 @@ class woocom_subcats extends WP_Widget {
     function widget($args, $instance)
     {
     extract($args);
-	if($instance) extract($instance);
 	
-	if($instance) echo $before_widget;
+	if(!empty($instance))
+	{
+		extract($instance);
+		echo $before_widget;
 	    if($title) echo $before_title . $title . $after_title;
+	} 
 	    
 	    if(isset($catslist) && !isset($show_subcategories_of_current_active_category))
 		{
@@ -173,40 +176,41 @@ class woocom_subcats extends WP_Widget {
 			if(!$current_tax || $current_tax == '')
 			{
 				$terms = get_the_terms( get_the_ID(), 'product_cat' );
-				foreach ( $terms as $term ) 
-				{
-					$ids = $term->term_id;
-				}
-				$cid = $ids;
+
 				$isproduct = true;
+
+				if($trems)
+				{
+					foreach ( $terms as $term ) 
+					{
+						$ids = $term->term_id;
+					}
+					$cid = $ids;
+				}
 			}
 			else
 			{
-				$cid = get_queried_object()->term_id;
-				$args['parent'] = $cid;
-			}
-			
-			
+				$args['parent'] = get_queried_object()->term_id;
+			}	
 		}
 
-			if($isproduct)
-			{
-				$categories = get_the_terms( get_the_ID(), 'product_cat' );
-			}
-			else
-			{
-				$categories = get_categories( $args );
-			}
-			
-			// $zurb = wp_list_categories( $args );
-			// echo htmlspecialchars($zurb);
-			
+		if($isproduct)
+		{
+			$categories = get_the_terms( get_the_ID(), 'product_cat' );
+		}
+		else
+		{
+			$categories = get_categories( $args );
+		}
+
+		if(!empty($categories))
+		{
+
 			if($show_parent_category)
 			{
 				echo '<ul class="product-categories woosubcats">';
-				// $link = get_term_link( $cat->slug, $cat->taxonomy );
-				$link = get_term_link( (int)$catslist, 'product_cat' );
-				$parent = get_term( (int)$catslist, 'product_cat' );
+				$link = get_term_link( $catslist, 'product_cat' );
+				$parent = get_term( $catslist, 'product_cat' );
 
 				echo '<li><a href="'.$link.'">'.$parent->name.'</a></li>';
 					echo '<ul class="children">';				
@@ -215,7 +219,7 @@ class woocom_subcats extends WP_Widget {
 			{ 
 				echo '<ul class="product-categories woosubcats">';
 			}
-			
+
 			foreach($categories as $cat)
 			{
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
@@ -232,7 +236,6 @@ class woocom_subcats extends WP_Widget {
 					   		if(isset($thumb_width)) $width = ' width="'.$thumb_width.'"';
 					   		if(isset($thumb_height)) $height = ' height="'.$thumb_height.'"';
 					   		$output .= '<img src="'.$image.'"'.$width.$height.'>';
-					   		// <img src="<?php echo $image; >" />  		
 					   	}
 				}
 				if(isset($show_category_title))
@@ -252,8 +255,9 @@ class woocom_subcats extends WP_Widget {
 			echo '</ul>';
 
 			if($show_parent_category) echo '</ul>';
+		}
 
-	if($instance) echo $after_widget;
+	if(!empty($instance)) echo $after_widget;
     }
 
     function shortcode( $atts )
@@ -261,10 +265,11 @@ class woocom_subcats extends WP_Widget {
     	extract( shortcode_atts( array(
     	  'cat' => 'default',
 	      'subcategories_of_current' => false,
-	      'hide_children' => false
+	      'hide_children' => false,
+	      'show_parent_category' => false
      	), $atts ) );
      	
-     	return wp_show_subcategories_menu($cat, $subcategories_of_current, $hide_children);
+     	return wp_show_subcategories_menu($cat, $subcategories_of_current, $hide_children, $show_parent_category);
     }
 }
 
@@ -277,7 +282,7 @@ function woocom_subcats_register_function()
 
 if(!function_exists('wp_show_subcategories_menu'))
 {
-	function wp_show_subcategories_menu( $cat, $show_subcategories_of_current_active_category = false, $hide_children_of_current_subcategory = false)
+	function wp_show_subcategories_menu( $cat, $show_subcategories_of_current_active_category = false, $hide_children_of_current_subcategory = false, $show_parent_category = false)
 	{
 		$submenu = new woocom_subcats();
 		$args = array(
@@ -286,6 +291,14 @@ if(!function_exists('wp_show_subcategories_menu'))
 		if($show_subcategories_of_current_active_category == true) $args['show_subcategories_of_current_active_category'] = true;
 
 		if($hide_children_of_current_subcategory == true) $args['hide_children_of_current_subcategory'] = true;
+
+		if($show_parent_category == true) $args['show_parent_category'] = true;
+
+		$instance = array(
+			'before_title' => '',
+			'title' => '',
+			'after_title' => ''
+			);
 		
 		echo $submenu->widget($args, $instance);
 	}
