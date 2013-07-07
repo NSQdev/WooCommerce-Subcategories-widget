@@ -21,6 +21,11 @@ After option is turned on:
 	* Subcategory
 	* Subcategory
 
+	
+```
+wp_show_subcategories_menu( category_id_or_slug, show_subcategories_of_current_active_category , hide_children_of_current_subcategory, show_parent_category )
+```
+
 
 #### Update 1.2.2
 
