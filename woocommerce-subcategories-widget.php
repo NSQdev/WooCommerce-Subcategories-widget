@@ -205,12 +205,14 @@ class woocom_subcats extends WP_Widget {
 
 		if(!empty($categories))
 		{
+			$link = get_term_link( (int)$catslist, 'product_cat' );
+			$parent = get_term( $catslist, 'product_cat' );
 
-			if($show_parent_category)
+			if($show_parent_category && !empty($parent))
 			{
+				
+				
 				echo '<ul class="product-categories woosubcats">';
-				$link = get_term_link( $catslist, 'product_cat' );
-				$parent = get_term( $catslist, 'product_cat' );
 
 				echo '<li><a href="'.$link.'">'.$parent->name.'</a></li>';
 					echo '<ul class="children">';				
@@ -254,7 +256,7 @@ class woocom_subcats extends WP_Widget {
 			}
 			echo '</ul>';
 
-			if($show_parent_category) echo '</ul>';
+			if($show_parent_category && !empty($parent)) echo '</ul>';
 		}
 
 	if(!empty($instance)) echo $after_widget;
@@ -297,7 +299,9 @@ if(!function_exists('wp_show_subcategories_menu'))
 		$instance = array(
 			'before_title' => '',
 			'title' => '',
-			'after_title' => ''
+			'after_title' => '',
+			'before_widget' => '',
+			'after_widget' => ''
 			);
 		
 		echo $submenu->widget($args, $instance);
