@@ -2,6 +2,10 @@
 
 Plugin that allows you to list product subcategories from selected parent category.
 
+#### Update 1.2.4
+
+* "current" class added to current category ("li" element) for styling purposes.
+
 #### Update 1.2.3
 
 * Added new option to output subcategories of selected category with parent category in hierarchy (nested lists)

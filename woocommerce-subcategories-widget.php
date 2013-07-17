@@ -3,8 +3,8 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
 Description: Shows subcategories from chosen or current active category
-Version: 1.2.3
-Author: Pavel Burov aka Dark Delphin
+Version: 1.2.4
+Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
 
@@ -90,6 +90,7 @@ class woocom_subcats extends WP_Widget {
 				'taxonomy'           => 'product_cat'
 			);
     	$next = get_categories($args);
+
     	if( $next )
     	{
     		echo '<ul class="children">';
@@ -131,6 +132,7 @@ class woocom_subcats extends WP_Widget {
     
     function widget($args, $instance)
     {
+    global $wp_query, $post, $woocommerce;
     extract($args);
 	
 	if(!empty($instance))
@@ -208,13 +210,25 @@ class woocom_subcats extends WP_Widget {
 			$link = get_term_link( (int)$catslist, 'product_cat' );
 			$parent = get_term( $catslist, 'product_cat' );
 
+			// if ( is_tax('product_cat') ) {
+			// 	if($wp_query->queried_object->slug == get_query_var('product_cat'))
+			// 	{
+			// 		$class = ' class="current"';					
+			// 	}
+			// }
+			// else
+			// {
+			// 	$class = '';
+			// }
+
 			if($show_parent_category && !empty($parent))
 			{
-				
+				if($wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
+				else $class = '';
 				
 				echo '<ul class="product-categories woosubcats">';
 
-				echo '<li><a href="'.$link.'">'.$parent->name.'</a></li>';
+				echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
 					echo '<ul class="children">';				
 			}
 			else
@@ -224,8 +238,10 @@ class woocom_subcats extends WP_Widget {
 
 			foreach($categories as $cat)
 			{
+				if($wp_query->queried_object->slug == $cat->slug) $class = ' class="current"';
+				else $class = '';
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
-				$output = '<li><a href="'.$link.'">';
+				$output = '<li'.$class.'><a href="'.$link.'">';
 
 				if(isset($show_category_thumbnail))
 				{
