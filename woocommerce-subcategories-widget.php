@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
 Description: Shows subcategories from chosen or current active category
-Version: 1.2.4
+Version: 1.2.5
 Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
@@ -25,8 +25,6 @@ class woocom_subcats extends WP_Widget {
     function form($instance)
     {
 	extract($instance);
-	
-	
 	
 	$taxlist = get_terms('product_cat', 'hide_empty=0');
 	?>
@@ -76,8 +74,13 @@ class woocom_subcats extends WP_Widget {
 	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked( '1', $show_parent_category ); ?>/>
 	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category with subcategories hierarchy'); ?></label>
 		</p>
+		<p>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked( '1', $show_same_level ); ?>/>
+	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>">Show categories of the same level</label>
+		</p>
 	    <!--some html with input fields-->
 	<?php
+	
     }
 
     function walk($cat , $show_category_thumbnail, $show_category_title)
@@ -192,7 +195,35 @@ class woocom_subcats extends WP_Widget {
 			}
 			else
 			{
-				$args['parent'] = get_queried_object()->term_id;
+				if(isset($show_same_level))
+				{
+					$args['parent'] = get_queried_object()->term_id;
+					$categories = get_categories( $args );
+
+					if(empty($categories)) 
+					{
+						$groundlevel = true;
+						
+						if(get_queried_object()->parent != 0)
+						{
+							$args['parent'] = get_queried_object()->parent;
+							$categories = get_categories( $args );
+						}
+						else
+						{
+							$args['parent'] = get_queried_object()->term_id;
+							$categories = get_categories( $args );
+						}
+					}
+					else
+					{
+						$groundlevel = false;
+					}
+				}
+				else
+				{
+					$args['parent'] = get_queried_object()->term_id;
+				}
 			}	
 		}
 
@@ -207,25 +238,32 @@ class woocom_subcats extends WP_Widget {
 
 		if(!empty($categories))
 		{
-			$link = get_term_link( (int)$catslist, 'product_cat' );
-			$parent = get_term( $catslist, 'product_cat' );
-
-			// if ( is_tax('product_cat') ) {
-			// 	if($wp_query->queried_object->slug == get_query_var('product_cat'))
-			// 	{
-			// 		$class = ' class="current"';					
-			// 	}
-			// }
-			// else
-			// {
-			// 	$class = '';
-			// }
+			if(isset($show_subcategories_of_current_active_category))
+			{
+				if($groundlevel)
+				{
+					$link = get_term_link( (int)get_queried_object()->parent, 'product_cat' );
+					$parent = get_term( (int)get_queried_object()->parent, 'product_cat' );
+				}
+				else
+				{
+					$link = get_term_link( (int)get_queried_object()->term_id, 'product_cat' );
+					$parent = get_term( (int)get_queried_object()->term_id, 'product_cat' );
+				}
+				
+			}
+			else
+			{
+				$link = get_term_link( (int)$catslist, 'product_cat' );
+				$parent = get_term( (int)$catslist, 'product_cat' );
+			}
+			
 
 			if($show_parent_category && !empty($parent))
 			{
 				if($wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
 				else $class = '';
-				
+						
 				echo '<ul class="product-categories woosubcats">';
 
 				echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
@@ -240,6 +278,7 @@ class woocom_subcats extends WP_Widget {
 			{
 				if($wp_query->queried_object->slug == $cat->slug) $class = ' class="current"';
 				else $class = '';
+
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
 				$output = '<li'.$class.'><a href="'.$link.'">';
 
