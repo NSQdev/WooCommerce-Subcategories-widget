@@ -78,6 +78,10 @@ class woocom_subcats extends WP_Widget {
 	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked( '1', $show_same_level ); ?>/>
 	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>">Show categories of the same level</label>
 		</p>
+		<p>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('lock_levels'); ?>" name="<? echo $this->get_field_name('lock_levels'); ?>" value="1" <?php checked( '1', $lock_levels ); ?>/>
+	    	<label for="<? echo $this->get_field_id('lock_levels'); ?>">Lock levels</label>
+		</p>
 	    <!--some html with input fields-->
 	<?php
 	
@@ -131,6 +135,14 @@ class woocom_subcats extends WP_Widget {
     		}
     		echo '</ul>';
     	}
+    }
+
+    function gettopparent($id)
+    {
+    	$cat = get_term( $id, 'product_cat' );
+    	
+    	if($cat->parent != 0) return $this->gettopparent($cat->parent);
+		else return $cat->term_id;
     }
     
     function widget($args, $instance)
@@ -224,6 +236,24 @@ class woocom_subcats extends WP_Widget {
 				{
 					$args['parent'] = get_queried_object()->term_id;
 				}
+
+				if(isset($lock_levels))
+				{
+					if(get_queried_object()->parent == 0)
+					{
+					$args['parent'] = get_queried_object()->term_id;
+					$categories = get_categories( $args );
+					}
+					else
+					{
+					$args['parent'] = $this->gettopparent(get_queried_object()->term_id);
+					$categories = get_categories( $args );
+					}
+				}
+				else
+				{
+					$args['parent'] = get_queried_object()->term_id;
+				}
 			}	
 		}
 
@@ -244,6 +274,17 @@ class woocom_subcats extends WP_Widget {
 				{
 					$link = get_term_link( (int)get_queried_object()->parent, 'product_cat' );
 					$parent = get_term( (int)get_queried_object()->parent, 'product_cat' );
+				}
+				else
+				{
+					$link = get_term_link( (int)get_queried_object()->term_id, 'product_cat' );
+					$parent = get_term( (int)get_queried_object()->term_id, 'product_cat' );
+				}
+
+				if(isset($lock_levels))
+				{
+					$link = get_term_link( (int)$args['parent'], 'product_cat' );
+					$parent = get_term( (int)$args['parent'], 'product_cat' );
 				}
 				else
 				{
