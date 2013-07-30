@@ -251,8 +251,8 @@ class woocom_subcats extends WP_Widget {
 					   	if ($thumbnail_id) 
 					   	{
 					   		$image = wp_get_attachment_url( $thumbnail_id );
-					   		if(isset($thumb_width)) $width = ' width="'.$thumb_width.'"';
-					   		if(isset($thumb_height)) $height = ' height="'.$thumb_height.'"';
+					   		if(isset($thumb_width) && $thumb_width != 0) $width = ' width="'.$thumb_width.'"';
+					   		if(isset($thumb_height) && $thumb_height != 0) $height = ' height="'.$thumb_height.'"';
 					   		$output .= '<img src="'.$image.'"'.$width.$height.'>';
 					   	}
 				}
