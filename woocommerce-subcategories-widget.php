@@ -103,8 +103,11 @@ class woocom_subcats extends WP_Widget {
     		echo '<ul class="children">';
     		foreach ($next as $n)
     		{
+    			if(get_queried_object()->slug == $n->slug) $class = ' class="current"';
+				else $class = '';
+
     			$link = get_term_link( $n->slug, $n->taxonomy );
-				$output = '<li><a href="'.$link.'">';
+				$output = '<li'.$class.'><a href="'.$link.'">';
 
 				if(isset($show_category_thumbnail))
 				{
