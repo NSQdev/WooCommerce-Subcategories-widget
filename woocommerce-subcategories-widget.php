@@ -87,7 +87,7 @@ class woocom_subcats extends WP_Widget {
 	
     }
 
-    function walk($cat , $show_category_thumbnail, $show_category_title)
+    function walk($cat , $show_category_thumbnail, $show_category_title, $level)
     {	
     	$args = array(
 				'hierarchical'       => 1,
@@ -100,7 +100,8 @@ class woocom_subcats extends WP_Widget {
 
     	if( $next )
     	{
-    		echo '<ul class="children">';
+    		echo '<ul class="children level'.$level.'">';
+    		$level++;
     		foreach ($next as $n)
     		{
     			if(get_queried_object()->slug == $n->slug) $class = ' class="current"';
@@ -133,7 +134,7 @@ class woocom_subcats extends WP_Widget {
 				$output .= '</a></li>';
 				echo $output;
 
-				$this->walk($n->term_id, $show_category_thumbnail, $show_category_title);
+				$this->walk($n->term_id, $show_category_thumbnail, $show_category_title, $level);
 				
     		}
     		echo '</ul>';
@@ -302,20 +303,24 @@ class woocom_subcats extends WP_Widget {
 				$parent = get_term( (int)$catslist, 'product_cat' );
 			}
 			
+			$level = 0;
 
 			if($show_parent_category && !empty($parent))
 			{
 				if($wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
 				else $class = '';
 						
-				echo '<ul class="product-categories woosubcats">';
+				echo '<ul class="product-categories woosubcats level'.$level.'">';
 
 				echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
-					echo '<ul class="children">';				
+				$level++;
+					echo '<ul class="children level'.$level.'">';
+					$level++;				
 			}
 			else
 			{ 
-				echo '<ul class="product-categories woosubcats">';
+				echo '<ul class="product-categories woosubcats level'.$level.'">';
+				$level++;
 			}
 
 			foreach($categories as $cat)
@@ -351,7 +356,7 @@ class woocom_subcats extends WP_Widget {
 				echo $output;
 
 				if(isset($hide_children_of_current_subcategory)) continue;
-				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title);
+				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level);
 			}
 			echo '</ul>';
 
