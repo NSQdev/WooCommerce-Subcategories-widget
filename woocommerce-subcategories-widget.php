@@ -87,7 +87,7 @@ class woocom_subcats extends WP_Widget {
 	
     }
 
-    function walk($cat , $show_category_thumbnail, $show_category_title, $level)
+    function walk($cat , $show_category_thumbnail, $show_category_title, $level, $thumb_width = 0, $thumb_height  = 0)
     {	
     	$args = array(
 				'hierarchical'       => 1,
@@ -122,6 +122,12 @@ class woocom_subcats extends WP_Widget {
 					   		$output .= '<img src="'.$image.'"'.$width.$height.'>';
 					   		// <img src="<?php echo $image; >" />  		
 					   	}
+					   	else
+					   	{
+					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
+					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
+					   		$output .= '<img src="'.plugins_url().'/woocommerce//assets/images/placeholder.png"'.$width.$height.'>';					   		
+					   	}
 				}
 				if(isset($show_category_title))
 				{
@@ -134,7 +140,7 @@ class woocom_subcats extends WP_Widget {
 				$output .= '</a></li>';
 				echo $output;
 
-				$this->walk($n->term_id, $show_category_thumbnail, $show_category_title, $level);
+				$this->walk($n->term_id, $show_category_thumbnail, $show_category_title, $level, $thumb_width = 0, $thumb_height = 0);
 				
     		}
     		echo '</ul>';
@@ -339,9 +345,15 @@ class woocom_subcats extends WP_Widget {
 					   	if ($thumbnail_id) 
 					   	{
 					   		$image = wp_get_attachment_url( $thumbnail_id );
-					   		if(isset($thumb_width)) $width = ' width="'.$thumb_width.'"';
-					   		if(isset($thumb_height)) $height = ' height="'.$thumb_height.'"';
+					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
+					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
 					   		$output .= '<img src="'.$image.'"'.$width.$height.'>';
+					   	}
+					   	else
+					   	{
+					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
+					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
+					   		$output .= '<img src="'.plugins_url().'/woocommerce//assets/images/placeholder.png"'.$width.$height.'>';					   		
 					   	}
 				}
 				if(isset($show_category_title))
@@ -356,7 +368,7 @@ class woocom_subcats extends WP_Widget {
 				echo $output;
 
 				if(isset($hide_children_of_current_subcategory)) continue;
-				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level);
+				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level, $thumb_width, $thumb_height);
 			}
 			echo '</ul>';
 
