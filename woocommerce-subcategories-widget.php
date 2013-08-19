@@ -340,7 +340,50 @@ class woocom_subcats extends WP_Widget {
 						
 				echo '<ul class="product-categories woosubcats level'.$level.'">';
 
-				echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
+				if(isset($show_category_thumbnail))
+				{
+				$thumbnail_id = get_metadata( 'woocommerce_term', $parent->woocommerce_term_id, 'thumbnail_id', true );
+				if(!$thumbnail_id) $thumbnail_id = get_metadata( 'woocommerce_term', $parent->term_id, 'thumbnail_id', true );;
+				
+					   	if ($thumbnail_id) 
+					   	{
+					   		$image = wp_get_attachment_url( $thumbnail_id );
+
+					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
+					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
+					   		// $output .= '<img src="'.$image.'"'.$width.$height.'>';
+
+					   		echo '<li'.$class.'><a href="'.$link.'"><img src="'.$image.'"'.$width.$height.'></a>';
+
+					   		if(isset($show_category_title))
+					   		{
+					   			echo '<a href="'.$link.'">'.$parent->name.'</a>';
+					   		}
+
+					   		echo '</li>';
+					   	}
+					   	else
+					   	{
+					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
+					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
+					   		// $output .= '<img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png"'.$width.$height.'>';
+
+					   		echo '<li'.$class.'><a href="'.$link.'"><img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png"'.$width.$height.'></a>';
+
+					   		if(isset($show_category_title))
+					   		{
+					   			echo '<a href="'.$link.'">'.$parent->name.'</a>';
+					   		}
+
+					   		echo '</li>';
+					   	}
+				}
+				else
+				{
+					echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
+				}
+
+				
 				$level++;
 					echo '<ul class="children level'.$level.'">';
 					$level++;				
@@ -377,7 +420,7 @@ class woocom_subcats extends WP_Widget {
 					   	{
 					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
 					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-					   		$output .= '<img src="'.plugins_url().'/woocommerce//assets/images/placeholder.png"'.$width.$height.'>';					   		
+					   		$output .= '<img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png"'.$width.$height.'>';					   		
 					   	}
 				}
 				if(isset($show_category_title))
