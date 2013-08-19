@@ -2,13 +2,22 @@
 
 Plugin that allows you to list product subcategories from selected parent category.
 
+#### Update 1.3.0
+
+* Fixes and improvements.
+* More clear options labels (hopefully).
+* "level$" helper list classes for more control over output via CSS.
+* "wcscw-level$"" helper body classes for more control over output via CSS.
+* New feature "Always show categories of the same level". 
+* Fixed bugs with categories thumbnails and parent category thumbnail.
+
 #### Update 1.2.4
 
 * "current" class added to current category ("li" element) for styling purposes.
 
 #### Update 1.2.3
 
-* Added new option to output subcategories of selected category with parent category in hierarchy (nested lists)
+* Added new option to output subcategories of selected category with parent category in hierarchy (nested lists).
 
 Example ("Parent" category is selected):
 

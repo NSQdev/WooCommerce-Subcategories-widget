@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
 Description: Shows subcategories from chosen or current active category
-Version: 1.2.6
+Version: 1.3.0
 Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
@@ -14,7 +14,7 @@ class woocom_subcats extends WP_Widget {
     {
 	$params = array(
 		'name' => 'WooCommerce Subcategories',
-	    'description' => 'Shows subcategories from chosen category' // plugin description that is showed in Widget section of admin panel
+	    'description' => 'Shows subcategories of chosen category' // plugin description that is showed in Widget section of admin panel
 	);
 	
 	parent::__construct('woocom_subcats', '', $params);
@@ -38,26 +38,10 @@ class woocom_subcats extends WP_Widget {
 		    <label for="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>"><?php echo __('Show subcategories of current active category'); ?></label>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('hide_children_of_current_subcategory'); ?>" value="1" <?php checked( '1', $hide_children_of_current_subcategory ); ?>/>
-		    <label for="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>"><?php echo __('Hide children of current subcategory'); ?></label>
+			<?php echo __('Or choose permanent category below:') ?>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( '1', $show_category_title ); ?>/>
-		    <label for="<? echo $this->get_field_id('show_category_title'); ?>"><?php echo __('Show category title'); ?></label>
-		</p>
-		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_thumbnail'); ?>" name="<? echo $this->get_field_name('show_category_thumbnail'); ?>" value="1" <?php checked( '1', $show_category_thumbnail ); ?>/>
-		    <label for="<? echo $this->get_field_id('show_category_thumbnail'); ?>"><?php echo __('Show categories thumbnails'); ?></label>
-		</p>
-		<p>
-		    <label for="<?php echo $this->get_field_id('thumb_width'); ?>"><?php echo __('Thumbnail width and height:'); ?></label><br>
-		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_width'); ?>" name="<?php echo $this->get_field_name('thumb_width'); ?>" min="1" value="<?php if(isset($thumb_width)) echo esc_attr($thumb_width); else echo '150'; ?>"/> x 
-		
-		    <!-- <label for="<?php echo $this->get_field_id('thumb_height'); ?>"><?php echo __('Thumbnail height'); ?></label> -->
-		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_height'); ?>" name="<?php echo $this->get_field_name('thumb_height'); ?>" min="1" value="<?php if(isset($thumb_height)) echo esc_attr($thumb_height); else echo '150'; ?>"/>
-		</p>
-		<p>
-			<select id="<?php echo $this->get_field_id('catslist'); ?>" name="<?php echo $this->get_field_name('catslist'); ?>">
+			<select class="widefat" id="<?php echo $this->get_field_id('catslist'); ?>" name="<?php echo $this->get_field_name('catslist'); ?>">
 				<?php
 				foreach ($taxlist as $tax) 
 				{
@@ -72,17 +56,36 @@ class woocom_subcats extends WP_Widget {
 			</select>
 		</p>
 		<p>
+		    <input type="checkbox" id="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('hide_children_of_current_subcategory'); ?>" value="1" <?php checked( '1', $hide_children_of_current_subcategory ); ?>/>
+		    <label for="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>"><?php echo __('Hide subcategories of deeper levels'); ?></label>
+		</p>
+		<p>
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( '1', $show_category_title ); ?>/>
+		    <label for="<? echo $this->get_field_id('show_category_title'); ?>"><?php echo __('Show categories titles'); ?></label>
+		</p>
+		<p>
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_thumbnail'); ?>" name="<? echo $this->get_field_name('show_category_thumbnail'); ?>" value="1" <?php checked( '1', $show_category_thumbnail ); ?>/>
+		    <label for="<? echo $this->get_field_id('show_category_thumbnail'); ?>"><?php echo __('Show categories thumbnails'); ?></label>
+		</p>
+		<p>
+		    <label for="<?php echo $this->get_field_id('thumb_width'); ?>"><?php echo __('Thumbnail width and height:'); ?></label><br>
+		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_width'); ?>" name="<?php echo $this->get_field_name('thumb_width'); ?>" min="1" value="<?php if(isset($thumb_width)) echo esc_attr($thumb_width); else echo '150'; ?>"/> x 
+		
+		    <!-- <label for="<?php echo $this->get_field_id('thumb_height'); ?>"><?php echo __('Thumbnail height'); ?></label> -->
+		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_height'); ?>" name="<?php echo $this->get_field_name('thumb_height'); ?>" min="1" value="<?php if(isset($thumb_height)) echo esc_attr($thumb_height); else echo '150'; ?>"/>
+		</p>
+		<p>
 	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked( '1', $show_parent_category ); ?>/>
-	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category with subcategories hierarchy'); ?></label>
+	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category'); ?></label>
 		</p>
 		<p>
 	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked( '1', $show_same_level ); ?>/>
-	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>">Show categories of the same level</label>
+	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>"><?php echo __('Always show categories of the same level'); ?></label>
 		</p>
-		<p>
+		<!-- <p>
 	    	<input type="checkbox" id="<? echo $this->get_field_id('lock_levels'); ?>" name="<? echo $this->get_field_name('lock_levels'); ?>" value="1" <?php checked( '1', $lock_levels ); ?>/>
 	    	<label for="<? echo $this->get_field_id('lock_levels'); ?>">Lock levels</label>
-		</p>
+		</p> -->
 	    <!--some html with input fields-->
 	<?php
 	
@@ -266,23 +269,23 @@ class woocom_subcats extends WP_Widget {
 					$args['parent'] = get_queried_object()->term_id;
 				}
 
-				if(isset($lock_levels))
-				{
-					if(get_queried_object()->parent == 0)
-					{
-					$args['parent'] = get_queried_object()->term_id;
-					$categories = get_categories( $args );
-					}
-					else
-					{
-					$args['parent'] = $this->gettopparent(get_queried_object()->term_id);
-					$categories = get_categories( $args );
-					}
-				}
-				else
-				{
-					$args['parent'] = get_queried_object()->term_id;
-				}
+				// if(isset($lock_levels))
+				// {
+				// 	if(get_queried_object()->parent == 0)
+				// 	{
+				// 	$args['parent'] = get_queried_object()->term_id;
+				// 	$categories = get_categories( $args );
+				// 	}
+				// 	else
+				// 	{
+				// 	$args['parent'] = $this->gettopparent(get_queried_object()->term_id);
+				// 	$categories = get_categories( $args );
+				// 	}
+				// }
+				// else
+				// {
+				// 	$args['parent'] = get_queried_object()->term_id;
+				// }
 			}	
 		}
 
@@ -310,16 +313,16 @@ class woocom_subcats extends WP_Widget {
 					$parent = get_term( (int)get_queried_object()->term_id, 'product_cat' );
 				}
 
-				if(isset($lock_levels))
-				{
-					$link = get_term_link( (int)$args['parent'], 'product_cat' );
-					$parent = get_term( (int)$args['parent'], 'product_cat' );
-				}
-				else
-				{
-					$link = get_term_link( (int)get_queried_object()->term_id, 'product_cat' );
-					$parent = get_term( (int)get_queried_object()->term_id, 'product_cat' );
-				}
+				// if(isset($lock_levels))
+				// {
+				// 	$link = get_term_link( (int)$args['parent'], 'product_cat' );
+				// 	$parent = get_term( (int)$args['parent'], 'product_cat' );
+				// }
+				// else
+				// {
+				// 	$link = get_term_link( (int)get_queried_object()->term_id, 'product_cat' );
+				// 	$parent = get_term( (int)get_queried_object()->term_id, 'product_cat' );
+				// }
 				
 			}
 			else
