@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: 
 Description: Shows subcategories from chosen or current active category
-Version: 1.2.5
+Version: 1.2.6
 Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
@@ -20,6 +20,7 @@ class woocom_subcats extends WP_Widget {
 	parent::__construct('woocom_subcats', '', $params);
 
 	add_shortcode( 'wp_show_subcats', array($this, 'shortcode') );
+	add_filter('body_class', array($this, 'woocom_subcats_levels') );
     }
     
     function form($instance)
@@ -151,8 +152,26 @@ class woocom_subcats extends WP_Widget {
     {
     	$cat = get_term( $id, 'product_cat' );
     	
-    	if($cat->parent != 0) return $this->gettopparent($cat->parent);
-		else return $cat->term_id;
+    	//if($cat->parent != 0) return $this->gettopparent($cat->parent);
+		//else return $cat->term_id;
+
+		$ancestors = get_ancestors($id, 'product_cat');
+		return end($ancestors);
+    }
+
+    function woocom_subcats_levels($classes)
+    {
+    	if(get_queried_object()->parent == 0)
+    	{
+    		$classes[] = 'wcscw-level0';
+    	}
+    	else
+    	{
+    		$ancestors = get_ancestors(get_queried_object()->term_id, 'product_cat');
+    		$classes[] = 'wcscw-level'.count($ancestors);
+    	}
+
+    	return $classes;
     }
     
     function widget($args, $instance)
