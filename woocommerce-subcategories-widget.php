@@ -380,7 +380,7 @@ class woocom_subcats extends WP_Widget {
 				}
 				else
 				{
-					echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
+					if(!$isproduct) echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
 				}
 
 				
