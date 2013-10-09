@@ -60,8 +60,12 @@ class woocom_subcats extends WP_Widget {
 		    <label for="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>"><?php echo __('Hide subcategories of deeper levels'); ?></label>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( '1', $show_category_title ); ?>/>
-		    <label for="<? echo $this->get_field_id('show_category_title'); ?>"><?php echo __('Show categories titles'); ?></label>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked( '1', $show_parent_category ); ?>/>
+	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category'); ?></label>
+		</p>
+		<p>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked( '1', $show_same_level ); ?>/>
+	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>"><?php echo __('Always show categories of the same level'); ?></label>
 		</p>
 		<p>
 		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_thumbnail'); ?>" name="<? echo $this->get_field_name('show_category_thumbnail'); ?>" value="1" <?php checked( '1', $show_category_thumbnail ); ?>/>
@@ -75,13 +79,10 @@ class woocom_subcats extends WP_Widget {
 		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_height'); ?>" name="<?php echo $this->get_field_name('thumb_height'); ?>" min="1" value="<?php if(isset($thumb_height)) echo esc_attr($thumb_height); else echo '150'; ?>"/>
 		</p>
 		<p>
-	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked( '1', $show_parent_category ); ?>/>
-	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category'); ?></label>
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( '1', $show_category_title ); ?>/>
+		    <label for="<? echo $this->get_field_id('show_category_title'); ?>"><?php echo __('Show categories titles'); ?></label>
 		</p>
-		<p>
-	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked( '1', $show_same_level ); ?>/>
-	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>"><?php echo __('Always show categories of the same level'); ?></label>
-		</p>
+		
 		<!-- <p>
 	    	<input type="checkbox" id="<? echo $this->get_field_id('lock_levels'); ?>" name="<? echo $this->get_field_name('lock_levels'); ?>" value="1" <?php checked( '1', $lock_levels ); ?>/>
 	    	<label for="<? echo $this->get_field_id('lock_levels'); ?>">Lock levels</label>
