@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: WooCommerce Subcategories widget
-Plugin URI: 
+Plugin URI: https://github.com/darkdelphin/WooCommerce-Subcategories-widget
 Description: Shows subcategories from chosen or current active category
-Version: 1.3.0
+Version: 1.3.2
 Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
@@ -72,6 +72,26 @@ class woocom_subcats extends WP_Widget {
 		    <label for="<? echo $this->get_field_id('show_category_thumbnail'); ?>"><?php echo __('Show categories thumbnails'); ?></label>
 		</p>
 		<p>
+			<?php echo __('Thumbnail size:') ?>
+		</p>
+		<p>
+			<select class="widefat" id="<?php echo $this->get_field_id('thumbnail_size'); ?>" name="<?php echo $this->get_field_name('thumbnail_size'); ?>">
+				<?php
+					$thumb_sizes = array('thumbnail', 'medium', 'large', 'full');
+					$thumb_names = array('Thumbnail', 'Medium', 'Large', 'Full');
+					
+					foreach ($thumb_sizes as $key => $thumb_size) 
+					{
+						if(isset($thumbnail_size) && $thumbnail_size == $thumb_size) $selected = ' selected="selected"';
+						else $selected = '';
+						echo '<option value="'.$thumb_size.'"'.$selected.'>'.$thumb_names[$key].'</option>';						
+					}
+					// keywords for sizes (thumbnail, medium, large or full) 
+					
+				?>
+			</select>
+		</p>
+		<p>
 		    <label for="<?php echo $this->get_field_id('thumb_width'); ?>"><?php echo __('Thumbnail width and height:'); ?></label><br>
 		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_width'); ?>" name="<?php echo $this->get_field_name('thumb_width'); ?>" min="1" value="<?php if(isset($thumb_width)) echo esc_attr($thumb_width); else echo '150'; ?>"/> x 
 		
@@ -121,7 +141,18 @@ class woocom_subcats extends WP_Widget {
 				
 					   	if ($thumbnail_id) 
 					   	{
-					   		$image = wp_get_attachment_url( $thumbnail_id );
+					   		// $image = wp_get_attachment_url( $thumbnail_id );
+					   		if($thumbnail_size)
+					   		{
+					   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
+					   			$image = $image[0];
+					   		}
+					   		else
+					   		{
+					   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
+					   			$image = $image[0];
+					   		}
+
 					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
 					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
 					   		$output .= '<img src="'.$image.'"'.$width.$height.'>';
@@ -334,7 +365,7 @@ class woocom_subcats extends WP_Widget {
 			
 			$level = 0;
 
-			if($show_parent_category && !empty($parent))
+			if($show_parent_category && !empty($parent) && !$parent->errors)
 			{
 				if($wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
 				else $class = '';
@@ -343,12 +374,26 @@ class woocom_subcats extends WP_Widget {
 
 				if(isset($show_category_thumbnail))
 				{
+
 				$thumbnail_id = get_metadata( 'woocommerce_term', $parent->woocommerce_term_id, 'thumbnail_id', true );
-				if(!$thumbnail_id) $thumbnail_id = get_metadata( 'woocommerce_term', $parent->term_id, 'thumbnail_id', true );;
+				if(!$thumbnail_id) $thumbnail_id = get_metadata( 'woocommerce_term', $parent->term_id, 'thumbnail_id', true );
 				
 					   	if ($thumbnail_id) 
 					   	{
-					   		$image = wp_get_attachment_url( $thumbnail_id );
+					   		// $image = wp_get_attachment_url( $thumbnail_id );
+					   		if($thumbnail_size)
+					   		{
+					   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
+					   			$image = $image[0];
+					   		}
+					   		else
+					   		{
+					   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
+					   			$image = $image[0];
+					   		}
+							// $image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
+							// $image = $image[0];
+							// keywords for sizes (thumbnail, medium, large or full) 
 
 					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
 					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
@@ -410,7 +455,17 @@ class woocom_subcats extends WP_Widget {
 				
 					   	if ($thumbnail_id) 
 					   	{
-					   		$image = wp_get_attachment_url( $thumbnail_id );
+					   		// $image = wp_get_attachment_url( $thumbnail_id );
+					   		if($thumbnail_size)
+					   		{
+					   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
+					   			$image = $image[0];
+					   		}
+					   		else
+					   		{
+					   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
+					   			$image = $image[0];
+					   		}
 
 					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
 					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
