@@ -72,7 +72,7 @@ class woocom_subcats extends WP_Widget {
 		    <label for="<? echo $this->get_field_id('show_category_thumbnail'); ?>"><?php echo __('Show categories thumbnails'); ?></label>
 		</p>
 		<p>
-			<?php echo __('Thumbnail size:') ?>
+			<?php echo __('Thumbnail size (Source image):') ?>
 		</p>
 		<p>
 			<select class="widefat" id="<?php echo $this->get_field_id('thumbnail_size'); ?>" name="<?php echo $this->get_field_name('thumbnail_size'); ?>">
@@ -92,11 +92,14 @@ class woocom_subcats extends WP_Widget {
 			</select>
 		</p>
 		<p>
-		    <label for="<?php echo $this->get_field_id('thumb_width'); ?>"><?php echo __('Thumbnail width and height:'); ?></label><br>
+		    <label for="<?php echo $this->get_field_id('thumb_width'); ?>"><?php echo __('Width and Height attributes:'); ?></label><br>
 		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_width'); ?>" name="<?php echo $this->get_field_name('thumb_width'); ?>" min="1" value="<?php if(isset($thumb_width)) echo esc_attr($thumb_width); else echo '150'; ?>"/> x 
 		
 		    <!-- <label for="<?php echo $this->get_field_id('thumb_height'); ?>"><?php echo __('Thumbnail height'); ?></label> -->
 		    <input type="number" class="widefat" style="width: 80px;" id="<?php echo $this->get_field_id('thumb_height'); ?>" name="<?php echo $this->get_field_name('thumb_height'); ?>" min="1" value="<?php if(isset($thumb_height)) echo esc_attr($thumb_height); else echo '150'; ?>"/>
+		</p>
+		<p>
+			<?php echo __("Set each one to 0 to turn off"); ?>
 		</p>
 		<p>
 		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( '1', $show_category_title ); ?>/>
