@@ -77,18 +77,35 @@ class woocom_subcats extends WP_Widget {
 		<p>
 			<select class="widefat" id="<?php echo $this->get_field_id('thumbnail_size'); ?>" name="<?php echo $this->get_field_name('thumbnail_size'); ?>">
 				<?php
-					$thumb_sizes = array('thumbnail', 'medium', 'large', 'full');
-					$thumb_names = array('Thumbnail', 'Medium', 'Large', 'Full');
-					
-					foreach ($thumb_sizes as $key => $thumb_size) 
+					global $_wp_additional_image_sizes;
+
+					foreach (get_intermediate_image_sizes() as $key => $thumb_size) 
 					{
 						if(isset($thumbnail_size) && $thumbnail_size == $thumb_size) $selected = ' selected="selected"';
 						else $selected = '';
-						echo '<option value="'.$thumb_size.'"'.$selected.'>'.$thumb_names[$key].'</option>';						
+
+						$size = '';
+
+						if (isset($_wp_additional_image_sizes[$s])) 
+						{
+							$width = intval($_wp_additional_image_sizes[$thumb_size]['width']);
+							$height = intval($_wp_additional_image_sizes[$thumb_size]['height']);
+							if($width && $height) $size = $width.'x'.$height;
+						} 
+						else 
+						{
+							$width = get_option($thumb_size.'_size_w');
+							$height = get_option($thumb_size.'_size_h');
+							if($width && $height) $size = $width.'x'.$height;
+						}
+
+						echo '<option value="'.$thumb_size.'"'.$selected.'>'.$thumb_size.' '.$size.'</option>';						
 					}
+
 					// keywords for sizes (thumbnail, medium, large or full) 
 					
 				?>
+				<option value="full">full</option>
 			</select>
 		</p>
 		<p>
