@@ -22,10 +22,51 @@ class woocom_subcats extends WP_Widget {
 	add_shortcode( 'wp_show_subcats', array($this, 'shortcode') );
 	add_filter('body_class', array($this, 'woocom_subcats_levels') );
     }
+
+
+    function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+		
+		$instance['title'] = strip_tags($new_instance['title']);
+
+		$instance['catslist'] = strip_tags($new_instance['catslist']);
+		
+		$instance['thumbnail_size'] = strip_tags($new_instance['thumbnail_size']);
+		
+		$instance['thumb_width'] = strip_tags($new_instance['thumb_width']);
+		$instance['thumb_height'] = strip_tags($new_instance['thumb_height']);
+
+		$instance['show_subcategories_of_current_active_category'] = !empty($new_instance['show_subcategories_of_current_active_category']) ? 1 : 0;
+		$instance['hide_children_of_current_subcategory'] = !empty($new_instance['hide_children_of_current_subcategory']) ? 1 : 0;
+		$instance['show_parent_category'] = !empty($new_instance['show_parent_category']) ? 1 : 0;
+		$instance['show_same_level'] = !empty($new_instance['show_same_level']) ? 1 : 0;
+		$instance['show_category_thumbnail'] = !empty($new_instance['show_category_thumbnail']) ? 1 : 0;
+		$instance['show_category_title'] = !empty($new_instance['show_category_title']) ? 1 : 0;
+
+		return $instance;
+	}
+
     
     function form($instance)
     {
-	extract($instance);
+	// extract($instance);
+
+	$title = esc_attr( $instance['title'] );
+
+	$catslist = esc_attr( $instance['catslist'] );
+
+	$thumbnail_size = esc_attr( $instance['thumbnail_size'] );
+
+	$thumb_width = esc_attr( $instance['thumb_width'] );
+	$thumb_height = esc_attr( $instance['thumb_height'] );
+
+	$show_subcategories_of_current_active_category = isset( $instance['show_subcategories_of_current_active_category'] ) ? (bool) $instance['show_subcategories_of_current_active_category'] : false;
+	$hide_children_of_current_subcategory = isset( $instance['hide_children_of_current_subcategory'] ) ? (bool) $instance['hide_children_of_current_subcategory'] : false;
+	$show_parent_category = isset( $instance['show_parent_category'] ) ? (bool) $instance['show_parent_category'] : false;
+	$show_same_level = isset( $instance['show_same_level'] ) ? (bool) $instance['show_same_level'] : false;
+	$show_category_thumbnail = isset( $instance['show_category_thumbnail'] ) ? (bool) $instance['show_category_thumbnail'] : false;
+	$show_category_title = isset( $instance['show_category_title'] ) ? (bool) $instance['show_category_title'] : false;
+
 	
 	$taxlist = get_terms('product_cat', 'hide_empty=0');
 	?>
@@ -34,7 +75,7 @@ class woocom_subcats extends WP_Widget {
 		    <input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if(isset($title)) echo esc_attr($title) ?>"/>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>" name="<? echo $this->get_field_name('show_subcategories_of_current_active_category'); ?>" value="1" <?php checked(isset($instance['show_subcategories_of_current_active_category']) ? $instance['show_subcategories_of_current_active_category'] : 0); ?> />
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>" name="<? echo $this->get_field_name('show_subcategories_of_current_active_category'); ?>" value="1" <?php checked( $show_subcategories_of_current_active_category ); ?> />
 		    <?php // checked( '1', $show_subcategories_of_current_active_category ); ?>
 		    
 		    <label for="<? echo $this->get_field_id('show_subcategories_of_current_active_category'); ?>"><?php echo __('Show subcategories of current active category'); ?></label>
@@ -49,28 +90,28 @@ class woocom_subcats extends WP_Widget {
 				{
 					if(get_term_children( $tax->term_id, 'product_cat' )) 
 					{
-						if(isset($catslist) && $catslist == $tax->term_id) $selected = ' selected="selected"';
-						else $selected = '';
-						echo '<option value="'.$tax->term_id.'"'.$selected.'>'.$tax->name.'</option>';						
+						// if(isset($catslist) && $catslist == $tax->term_id) $selected = ' selected="selected"';
+						// else $selected = '';
+						echo '<option value="'.$tax->term_id.'" '.selected($catslist, $tax->term_id).'>'.$tax->name.'</option>';						
 					}
 				}
 				?>
 			</select>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('hide_children_of_current_subcategory'); ?>" value="1" <?php checked(isset($instance['hide_children_of_current_subcategory']) ? $instance['hide_children_of_current_subcategory'] : 0); ?>/>
+		    <input type="checkbox" id="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>" name="<? echo $this->get_field_name('hide_children_of_current_subcategory'); ?>" value="1" <?php checked( $hide_children_of_current_subcategory ); ?>/>
 		    <label for="<? echo $this->get_field_id('hide_children_of_current_subcategory'); ?>"><?php echo __('Hide subcategories of deeper levels'); ?></label>
 		</p>
 		<p>
-	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked(isset($instance['show_parent_category']) ? $instance['show_parent_category'] : 0); ?>/>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('show_parent_category'); ?>" name="<? echo $this->get_field_name('show_parent_category'); ?>" value="1" <?php checked( $show_parent_category ); ?>/>
 	    	<label for="<? echo $this->get_field_id('show_parent_category'); ?>"><?php echo __('Show parent category'); ?></label>
 		</p>
 		<p>
-	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked(isset($instance['show_same_level']) ? $instance['show_same_level'] : 0); ?>/>
+	    	<input type="checkbox" id="<? echo $this->get_field_id('show_same_level'); ?>" name="<? echo $this->get_field_name('show_same_level'); ?>" value="1" <?php checked( $show_same_level ); ?>/>
 	    	<label for="<? echo $this->get_field_id('show_same_level'); ?>"><?php echo __('Always show categories of the same level'); ?></label>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_thumbnail'); ?>" name="<? echo $this->get_field_name('show_category_thumbnail'); ?>" value="1" <?php checked(isset($instance['show_category_thumbnail']) ? $instance['show_category_thumbnail'] : 0); ?>/>
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_thumbnail'); ?>" name="<? echo $this->get_field_name('show_category_thumbnail'); ?>" value="1" <?php checked( $show_category_thumbnail ); ?>/>
 		    <label for="<? echo $this->get_field_id('show_category_thumbnail'); ?>"><?php echo __('Show categories thumbnails'); ?></label>
 		</p>
 		<p>
@@ -83,8 +124,8 @@ class woocom_subcats extends WP_Widget {
 
 					foreach (get_intermediate_image_sizes() as $key => $thumb_size) 
 					{
-						if(isset($thumbnail_size) && $thumbnail_size == $thumb_size) $selected = ' selected="selected"';
-						else $selected = '';
+						// if(isset($thumbnail_size) && $thumbnail_size == $thumb_size) $selected = ' selected="selected"';
+						// else $selected = '';
 
 						$size = '';
 
@@ -101,13 +142,13 @@ class woocom_subcats extends WP_Widget {
 							if($width && $height) $size = $width.'x'.$height;
 						}
 
-						echo '<option value="'.$thumb_size.'"'.$selected.'>'.$thumb_size.' '.$size.'</option>';						
+						echo '<option value="'.$thumb_size.'" '.selected($thumbnail_size, $thumb_size).'>'.$thumb_size.' '.$size.'</option>';						
 					}
 
 					// keywords for sizes (thumbnail, medium, large or full) 
 					
 				?>
-				<option value="full">full</option>
+				<option value="full" <?php selected($thumbnail_size, 'full'); ?>>full</option>
 			</select>
 		</p>
 		<p>
@@ -121,7 +162,7 @@ class woocom_subcats extends WP_Widget {
 			<?php echo __("Set each one to 0 to turn off"); ?>
 		</p>
 		<p>
-		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked(isset($instance['show_category_title']) ? $instance['show_category_title'] : 0); ?>/>
+		    <input type="checkbox" id="<? echo $this->get_field_id('show_category_title'); ?>" name="<? echo $this->get_field_name('show_category_title'); ?>" value="1" <?php checked( $show_category_title ); ?>/>
 		    <label for="<? echo $this->get_field_id('show_category_title'); ?>"><?php echo __('Show categories titles'); ?></label>
 		</p>
 		
