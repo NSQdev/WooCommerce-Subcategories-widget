@@ -508,7 +508,7 @@ class woocom_subcats extends WP_Widget {
 				}
 				else
 				{
-					if(!$isproduct) echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a></li>';
+					if(!$isproduct) echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a>'; //</li>';
 				}
 
 				
@@ -528,7 +528,7 @@ class woocom_subcats extends WP_Widget {
 				else $class = '';
 
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
-				$output = '<li'.$class.'><a class="img" href="'.$link.'">';
+				echo '<li'.$class.'>'; //<a class="img" href="'.$link.'">';
 
 				if($show_category_thumbnail)
 				{
@@ -563,21 +563,20 @@ class woocom_subcats extends WP_Widget {
 				}
 				if($show_category_title)
 				{
-					$output .= '<a class="text" href="'.$link.'">'.$cat->name.'</a>';
+					echo '<a class="text" href="'.$link.'">'.$cat->name.'</a>';
 				}
 				if(!$show_category_title && !$show_category_thumbnail)
 				{
-					$output .= '<a class="text" href="'.$link.'">'.$cat->name.'</a>';
+					echo '<a class="text" href="'.$link.'">'.$cat->name.'</a>';
 				}
-				$output .= '</li>';
-				echo $output;
-
-				if($hide_children_of_current_subcategory) continue;
-				$this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level, $thumb_width, $thumb_height);
+				
+				if(!$hide_children_of_current_subcategory) $this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level, $thumb_width, $thumb_height);
+				
+				echo '</li>';
 			}
 			echo '</ul>';
 
-			if($show_parent_category && !empty($parent)) echo '</ul>';
+			if($show_parent_category && !empty($parent)) echo '</li></ul>';
 		}
 
 	if(!empty($instance)) echo $after_widget;
