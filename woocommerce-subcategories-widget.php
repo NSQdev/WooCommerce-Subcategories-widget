@@ -260,7 +260,7 @@ class woocom_subcats extends WP_Widget {
 
     function woocom_subcats_levels($classes)
     {
-    	if(property_exists(get_queried_object(), 'parent') && get_queried_object()->parent == 0)
+    	if(get_queried_object() && property_exists(get_queried_object(), 'parent') && get_queried_object()->parent == 0)
     	{
     		$classes[] = 'wcscw-level0';
     	}
@@ -269,7 +269,7 @@ class woocom_subcats extends WP_Widget {
     		// echo '<pre>';
     		// print_r(get_queried_object());
     		// echo '</pre>';
-    		if(property_exists(get_queried_object(), 'term_id'))
+    		if(get_queried_object() && property_exists(get_queried_object(), 'term_id'))
     		{
 	    		$ancestors = get_ancestors(get_queried_object()->term_id, 'product_cat');
 	    		$classes[] = 'wcscw-level'.count($ancestors);
@@ -449,7 +449,7 @@ class woocom_subcats extends WP_Widget {
 
 			if($show_parent_category && !empty($parent) )// && !$parent->errors)
 			{
-				if(property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
+				if(get_queried_object() && property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
 				else $class = '';
 						
 				echo '<ul class="product-categories woosubcats level'.$level.'">';
@@ -524,7 +524,7 @@ class woocom_subcats extends WP_Widget {
 
 			foreach($categories as $cat)
 			{
-				if(property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $cat->slug) $class = ' class="current"';
+				if(get_queried_object() && property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $cat->slug) $class = ' class="current"';
 				else $class = '';
 
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
