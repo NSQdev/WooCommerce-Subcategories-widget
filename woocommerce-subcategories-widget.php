@@ -628,9 +628,9 @@ if(!function_exists('wp_show_subcategories_menu'))
 	}
 }
 
-add_action('wp_enqueue_scripts', 'wt2_scripts');
+add_action('wp_enqueue_scripts', 'woocommerce_subcategories_widget_scripts');
 
-function wt2_scripts()
+function woocommerce_subcategories_widget_scripts()
 {
 	wp_enqueue_script('woocommerce-subcategories-widget', plugins_url('/js/woocommerce-subcategories-widget.js', __FILE__), array('jquery'), '1.0', true );
 }
