@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: https://github.com/darkdelphin/WooCommerce-Subcategories-widget
 Description: Shows subcategories from chosen or current active category
-Version: 1.3.2
+Version: 1.4.0
 Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
@@ -12,19 +12,21 @@ class woocom_subcats extends WP_Widget {
     
     function __construct()
     {
-	$params = array(
-		'name' => 'WooCommerce Subcategories',
-	    'description' => 'Shows subcategories of chosen category' // plugin description that is showed in Widget section of admin panel
-	);
-	
-	parent::__construct('woocom_subcats', '', $params);
+		$params = array(
+			'name' => 'WooCommerce Subcategories',
+		    'description' => 'Shows subcategories of chosen category' // plugin description that is showed in Widget section of admin panel
+		);
+		
+		parent::__construct('woocom_subcats', '', $params);
 
-	add_shortcode( 'wp_show_subcats', array($this, 'shortcode') );
-	add_filter('body_class', array($this, 'woocom_subcats_levels') );
+		//add_shortcode( 'wp_show_subcats', array($this, 'shortcode') );
+		add_filter('body_class', array($this, 'woocom_subcats_levels') );
     }
 
 
     function update( $new_instance, $old_instance ) {
+    	// print_r($new_instance);
+    	file_put_contents('try.txt', print_r($new_instance, true));
 		$instance = $old_instance;
 		
 		$instance['title'] = strip_tags($new_instance['title']);
@@ -49,28 +51,28 @@ class woocom_subcats extends WP_Widget {
     
     function form($instance)
     {
-	// extract($instance);
-    // print_r($instance);
+		// extract($instance);
+	    // print_r($instance);
 
-	$title = esc_attr( $instance['title'] );
+		$title = esc_attr( $instance['title'] );
 
-	$catslist = esc_attr( $instance['catslist'] );
+		$catslist = esc_attr( $instance['catslist'] );
 
-	$thumbnail_size = esc_attr( $instance['thumbnail_size'] );
+		$thumbnail_size = esc_attr( $instance['thumbnail_size'] );
 
-	$thumb_width = esc_attr( $instance['thumb_width'] );
-	$thumb_height = esc_attr( $instance['thumb_height'] );
+		$thumb_width = esc_attr( $instance['thumb_width'] );
+		$thumb_height = esc_attr( $instance['thumb_height'] );
 
-	$show_subcategories_of_current_active_category = isset( $instance['show_subcategories_of_current_active_category'] ) ? (bool) $instance['show_subcategories_of_current_active_category'] : false;
-	$hide_children_of_current_subcategory = isset( $instance['hide_children_of_current_subcategory'] ) ? (bool) $instance['hide_children_of_current_subcategory'] : false;
-	$show_parent_category = isset( $instance['show_parent_category'] ) ? (bool) $instance['show_parent_category'] : false;
-	$show_same_level = isset( $instance['show_same_level'] ) ? (bool) $instance['show_same_level'] : false;
-	$show_category_thumbnail = isset( $instance['show_category_thumbnail'] ) ? (bool) $instance['show_category_thumbnail'] : false;
-	$show_category_title = isset( $instance['show_category_title'] ) ? (bool) $instance['show_category_title'] : false;
+		$show_subcategories_of_current_active_category = isset( $instance['show_subcategories_of_current_active_category'] ) ? (bool) $instance['show_subcategories_of_current_active_category'] : false;
+		$hide_children_of_current_subcategory = isset( $instance['hide_children_of_current_subcategory'] ) ? (bool) $instance['hide_children_of_current_subcategory'] : false;
+		$show_parent_category = isset( $instance['show_parent_category'] ) ? (bool) $instance['show_parent_category'] : false;
+		$show_same_level = isset( $instance['show_same_level'] ) ? (bool) $instance['show_same_level'] : false;
+		$show_category_thumbnail = isset( $instance['show_category_thumbnail'] ) ? (bool) $instance['show_category_thumbnail'] : false;
+		$show_category_title = isset( $instance['show_category_title'] ) ? (bool) $instance['show_category_title'] : false;
 
-	
-	$taxlist = get_terms('product_cat', 'hide_empty=0');
-	?>
+		
+		$taxlist = get_terms('product_cat', 'hide_empty=0');
+		?>
 		<p>
 		    <label for="<?php echo $this->get_field_id('title'); ?>"><?php echo __('Title: '); ?></label>
 		    <input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if(isset($title)) echo esc_attr($title) ?>"/>
@@ -172,7 +174,7 @@ class woocom_subcats extends WP_Widget {
 	    	<label for="<? echo $this->get_field_id('lock_levels'); ?>">Lock levels</label>
 		</p> -->
 	    <!--some html with input fields-->
-	<?php
+		<?php
 	
     }
 
@@ -247,16 +249,16 @@ class woocom_subcats extends WP_Widget {
     	}
     }
 
-    function gettopparent($id)
-    {
-    	$cat = get_term( $id, 'product_cat' );
+  //   function gettopparent($id)
+  //   {
+  //   	$cat = get_term( $id, 'product_cat' );
     	
-    	//if($cat->parent != 0) return $this->gettopparent($cat->parent);
-		//else return $cat->term_id;
+  //   	//if($cat->parent != 0) return $this->gettopparent($cat->parent);
+		// //else return $cat->term_id;
 
-		$ancestors = get_ancestors($id, 'product_cat');
-		return end($ancestors);
-    }
+		// $ancestors = get_ancestors($id, 'product_cat');
+		// return end($ancestors);
+  //   }
 
     function woocom_subcats_levels($classes)
     {
@@ -285,20 +287,19 @@ class woocom_subcats extends WP_Widget {
     
     function widget($args, $instance)
     {
-    global $wp_query, $post, $woocommerce;
-    extract($args);
-    // extract($instance);
+	    global $wp_query, $post, $woocommerce;
+	    extract($args, EXTR_SKIP);
+	    // extract($instance);
 
-    $isproduct = false;
-    $groundlevel = false;
-	
-	if(!empty($instance))
-	{
-		// print_r($instance);
-		extract($instance);
-		echo $before_widget;
-	    if($title) echo $before_title . $title . $after_title;
-	} 
+	    $isproduct = false;
+	    $groundlevel = false;
+		
+		//if(!empty($instance))
+		//{
+			extract($instance);
+			echo $before_widget;
+		    if($title) echo $before_title . $title . $after_title;
+		//} 
 	    
 	    if(isset($catslist) && !$show_subcategories_of_current_active_category)
 		{
@@ -579,52 +580,105 @@ class woocom_subcats extends WP_Widget {
 			if($show_parent_category && !empty($parent)) echo '</li></ul>';
 		}
 
-	if(!empty($instance)) echo $after_widget;
-    }
-
-    function shortcode( $atts )
-    {
-    	extract( shortcode_atts( array(
-    	  'cat' => 'default',
-	      'subcategories_of_current' => false,
-	      'hide_children' => false,
-	      'show_parent_category' => false
-     	), $atts ) );
-     	
-     	return wp_show_subcategories_menu($cat, $subcategories_of_current, $hide_children, $show_parent_category);
+		if(!empty($instance)) echo $after_widget;
     }
 }
 
-add_action('widgets_init', 'woocom_subcats_register_function');
+//add_action('widgets_init', 'woocom_subcats_register_function');
 
-function woocom_subcats_register_function()
-{
-    register_widget('woocom_subcats');
-}
+// function woocom_subcats_register_function()
+// {
+//     register_widget('woocom_subcats');
+// }
 
-if(!function_exists('wp_show_subcategories_menu'))
-{
-	function wp_show_subcategories_menu( $cat, $show_subcategories_of_current_active_category = false, $hide_children_of_current_subcategory = false, $show_parent_category = false)
-	{
-		$submenu = new woocom_subcats();
-		$args = array(
-			'catslist' => $cat
-			);
-		if($show_subcategories_of_current_active_category == true) $args['show_subcategories_of_current_active_category'] = true;
+if ( !defined('ABSPATH') ) die;
 
-		if($hide_children_of_current_subcategory == true) $args['hide_children_of_current_subcategory'] = true;
+class Woocommerce_subcategories_widget extends WP_Widget {
 
-		if($show_parent_category == true) $args['show_parent_category'] = true;
+	// Constructor
+	function Woocommerce_subcategories_widget() {
 
-		$instance = array(
-			'before_title' => '',
-			'title' => '',
-			'after_title' => '',
-			'before_widget' => '',
-			'after_widget' => ''
-			);
+		$params = array(
+			'classname' => 'woocommerce_subcategories_widget',
+		    'description' => 'Shows subcategories of chosen category' // plugin description that is showed in Widget section of admin panel
+		);
+
+		// id, name, other parameters
+		$this->WP_Widget('woocommerce_subcategories_widget', 'WooCommerce Subcategories', $params);
+	}
+
+	function widget( $args, $instance ) {
+
+		extract( $args );
+
+		$title = $instance['title'];
+		$catslist = $instance['catslist'];
+		$show_active = $instance['show_active'];
+
+		echo $before_widget;
+
+		if ( $title ) echo $before_title . $title . $after_title;
+
+		echo 'Number of category: '.$catslist.'<br>';
+		echo 'First checkbox checked: '.$show_active.'<br>';
+
+		echo $after_widget;
+	}
+
+	function update( $new_instance, $old_instance ) {
 		
-		echo $submenu->widget($args, $instance);
+		$instance = $old_instance;
+		
+		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['catslist'] = strip_tags($new_instance['catslist']);
+		$instance['show_active'] = !empty($new_instance['show_active']) ? 1 : 0;
+
+		return $instance;
+	}
+
+	function form( $instance ) {
+
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '') );
+
+		$title = esc_attr( $instance['title'] );
+		$catslist = esc_attr( $instance['catslist'] );
+
+		$show_active = isset( $instance['show_active'] ) ? (bool) $instance['show_active'] : false;
+
+		$taxlist = get_terms('product_cat', 'hide_empty=0');
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id('title') ); ?>" name="<?php echo esc_attr( $this->get_field_name('title') ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_active') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_active') ); ?>"<?php checked( $show_active ); ?> />
+			<label for="<?php echo $this->get_field_id('show_active'); ?>"><?php _e( 'Show subcategories of current active category' ); ?></label>
+		</p>
+		<p>
+			<?php echo __('Or choose permanent category below:') ?>
+		</p>
+		<p>
+			<select class="widefat" id="<?php echo $this->get_field_id('catslist'); ?>" name="<?php echo $this->get_field_name('catslist'); ?>">
+				<?php
+				foreach ($taxlist as $tax) 
+				{
+					if(get_term_children( $tax->term_id, 'product_cat' )) 
+					{
+						echo '<option value="'.$tax->term_id.'" '.selected($catslist, $tax->term_id).'>'.$tax->name.'</option>';						
+					}
+				}
+				?>
+			</select>
+		</p>
+		<?php
 	}
 }
+
+function woocommerce_subcategories_widget_register() {
+    register_widget('woocommerce_subcategories_widget');
+}
+add_action('widgets_init', 'woocommerce_subcategories_widget_register');
+
+
 ?>
