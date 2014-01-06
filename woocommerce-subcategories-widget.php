@@ -29,15 +29,25 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		extract( $args );
 
 		$title = $instance['title'];
-		$catslist = $instance['catslist'];
 		$show_active = $instance['show_active'];
+		$catslist = $instance['catslist'];
+		$hide_children = $instance['hide_children'];
+		$show_parent_category = $instance['show_parent_category'];
 		$show_same_level = $instance['show_same_level'];
+		$show_category_thumbnail = $instance['show_category_thumbnail'];
+		$thumbnail_size = $instance['thumbnail_size'];
+		$show_category_title = $instance['show_category_title'];
 
 		$input = array(
 			'title' => $instance['title'],
-			'catslist' => $instance['catslist'],
 			'show_active' => $instance['show_active'],
-			'show_same_level' => $instance['show_same_level']
+			'catslist' => $instance['catslist'],
+			'hide_children' => $instance['hide_children'],
+			'show_parent_category' => $instance['show_parent_category'],
+			'show_same_level' => $instance['show_same_level'],
+			'show_category_thumbnail' => $instance['show_category_thumbnail'],
+			'thumbnail_size' => $instance['thumbnail_size'],
+			'show_category_title' => $instance['show_category_title']
 			);
 
 		echo $before_widget;
@@ -54,9 +64,14 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$instance = $old_instance;
 		
 		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['catslist'] = strip_tags($new_instance['catslist']);
 		$instance['show_active'] = !empty($new_instance['show_active']) ? 1 : 0;
+		$instance['catslist'] = strip_tags($new_instance['catslist']);
+		$instance['hide_children'] = !empty($new_instance['hide_children']) ? 1 : 0;
+		$instance['show_parent_category'] = !empty($new_instance['show_parent_category']) ? 1 : 0;
 		$instance['show_same_level'] = !empty($new_instance['show_same_level']) ? 1 : 0;
+		$instance['show_category_thumbnail'] = !empty($new_instance['show_category_thumbnail']) ? 1 : 0;
+		$instance['thumbnail_size'] = strip_tags($new_instance['thumbnail_size']);
+		$instance['show_category_title'] = !empty($new_instance['show_category_title']) ? 1 : 0;
 
 		return $instance;
 	}
@@ -66,10 +81,14 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '') );
 
 		$title = esc_attr( $instance['title'] );
-		$catslist = esc_attr( $instance['catslist'] );
-
 		$show_active = isset( $instance['show_active'] ) ? (bool) $instance['show_active'] : false;
+		$catslist = esc_attr( $instance['catslist'] );
+		$hide_children = isset( $instance['hide_children'] ) ? (bool) $instance['hide_children'] : false;
+		$show_parent_category = isset( $instance['show_parent_category'] ) ? (bool) $instance['show_parent_category'] : false;
 		$show_same_level = isset( $instance['show_same_level'] ) ? (bool) $instance['show_same_level'] : false;
+		$show_category_thumbnail = isset( $instance['show_category_thumbnail'] ) ? (bool) $instance['show_category_thumbnail'] : false;
+		$thumbnail_size = esc_attr( $instance['thumbnail_size'] );
+		$show_category_title = isset( $instance['show_category_title'] ) ? (bool) $instance['show_category_title'] : false;
 
 		$taxlist = get_terms('product_cat', 'hide_empty=0');
 		?>
@@ -98,8 +117,56 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			</select>
 		</p>
 		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('hide_children') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hide_children') ); ?>"<?php checked( $hide_children ); ?> />
+			<label for="<?php echo $this->get_field_id('hide_children'); ?>"><?php _e( 'Hide subcategories of deeper levels' ); ?></label>
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_parent_category') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_parent_category') ); ?>"<?php checked( $show_parent_category ); ?> />
+			<label for="<?php echo $this->get_field_id('show_parent_category'); ?>"><?php _e( 'Show parent category' ); ?></label>
+		</p>
+		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_same_level') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_same_level') ); ?>"<?php checked( $show_same_level ); ?> />
 			<label for="<?php echo $this->get_field_id('show_same_level'); ?>"><?php _e( 'Always show categories of the same level' ); ?></label>
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_category_thumbnail') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_category_thumbnail') ); ?>"<?php checked( $show_category_thumbnail ); ?> />
+			<label for="<?php echo $this->get_field_id('show_category_thumbnail'); ?>"><?php _e( 'Show categories thumbnails' ); ?></label>
+		</p>
+		<p>
+			<?php _e('Thumbnail size:') ?>
+		</p>
+		<p>
+			<select class="widefat" id="<?php echo $this->get_field_id('thumbnail_size'); ?>" name="<?php echo $this->get_field_name('thumbnail_size'); ?>">
+				<?php
+					global $_wp_additional_image_sizes;
+
+					foreach (get_intermediate_image_sizes() as $key => $thumb_size) 
+					{
+						$size = '';
+
+						if (isset($_wp_additional_image_sizes[$thumb_size])) 
+						{
+							$width = intval($_wp_additional_image_sizes[$thumb_size]['width']);
+							$height = intval($_wp_additional_image_sizes[$thumb_size]['height']);
+							if($width && $height) $size = ' - '.$width.' x '.$height;
+						} 
+						else 
+						{
+							$width = get_option($thumb_size.'_size_w');
+							$height = get_option($thumb_size.'_size_h');
+							if($width && $height) $size = ' - '.$width.' x '.$height;
+						}
+
+						echo '<option value="'.$thumb_size.'" '.selected($thumbnail_size, $thumb_size).'>'.$thumb_size.' '.$size.'</option>';						
+					}
+					// keywords for sizes (thumbnail, medium, large or full) 
+				?>
+				<option value="full" <?php selected($thumbnail_size, 'full'); ?>>full</option>
+			</select>
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_category_title') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_category_title') ); ?>"<?php checked( $show_category_title ); ?> />
+			<label for="<?php echo $this->get_field_id('show_category_title'); ?>"><?php _e( 'Show categories titles' ); ?></label>
 		</p>
 		<?php
 	}
@@ -140,7 +207,6 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				'echo'               => 0,
 				'depth'				 => 1,
 				'hide_empty'         => 0,
-				// 'parent'			 => $cid,
 				'taxonomy'           => 'product_cat'
 			);
 
@@ -148,18 +214,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 
 			if(!$current_tax || $current_tax == '')
 			{
-				$terms = get_the_terms( get_the_ID(), 'product_cat' );
-
-				$isproduct = true;
-
-				if($terms)
-				{
-					foreach ( $terms as $term ) 
-					{
-						$ids = $term->term_id;
-					}
-					$cid = $ids;
-				}
+				if(get_class(get_queried_object()) == 'WP_Post') $isproduct = true;
+				else return false;	
 			}
 			else
 			{
@@ -189,8 +245,10 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			}	
 		}
 
+		// Here we get all categories
 		if($isproduct) $categories = get_the_terms( get_the_ID(), 'product_cat' );
 		else $categories = get_categories( $args );
+		// -------
 
 		if(!empty($categories))
 		{
@@ -218,80 +276,27 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			
 			$level = 0;
 
-			// if($show_parent_category && !empty($parent) )// && !$parent->errors)
-			// {
-			// 	if(get_queried_object() && property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $parent->slug) $class = ' class="current"';
-			// 	else $class = '';
-						
-			// 	echo '<ul class="product-categories woosubcats level'.$level.'">';
+			echo '<ul class="product-categories subcategories level'.$level.'">';
+			$level++;
 
-			// 	if($show_category_thumbnail)
-			// 	{
+				if($show_parent_category && !empty($parent) )
+				{
+					if(get_queried_object() && property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $parent->slug) $class = ' class="parent current"';
+					else $class = 'parent';
 
-			// 	$thumbnail_id = get_metadata( 'woocommerce_term', $parent->woocommerce_term_id, 'thumbnail_id', true );
-			// 	if(!$thumbnail_id) $thumbnail_id = get_metadata( 'woocommerce_term', $parent->term_id, 'thumbnail_id', true );
-				
-			// 		   	if ($thumbnail_id) 
-			// 		   	{
-			// 		   		// $image = wp_get_attachment_url( $thumbnail_id );
-			// 		   		if($thumbnail_size)
-			// 		   		{
-			// 		   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
-			// 		   			$image = $image[0];
-			// 		   		}
-			// 		   		else
-			// 		   		{
-			// 		   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
-			// 		   			$image = $image[0];
-			// 		   		}
-			// 				// $image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
-			// 				// $image = $image[0];
-			// 				// keywords for sizes (thumbnail, medium, large or full) 
+					echo '<li'.$class.'>';
 
-			// 		   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
-			// 		   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-			// 		   		// $output .= '<img src="'.$image.'"'.$width.$height.'>';
+					if($show_category_thumbnail)
+					{
+						$this->get_thumbnail($parent);
 
-			// 		   		echo '<li'.$class.'><a href="'.$link.'"><img src="'.$image.'"'.$width.$height.'></a>';
+						if($show_category_title) echo '<a href="'.$link.'">'.$parent->name.'</a>';
 
-			// 		   		if($show_category_title)
-			// 		   		{
-			// 		   			echo '<a href="'.$link.'">'.$parent->name.'</a>';
-			// 		   		}
+					}
+					else if(!$isproduct) echo '<a href="'.$link.'">'.$parent->name.'</a>';
 
-			// 		   		echo '</li>';
-			// 		   	}
-			// 		   	else
-			// 		   	{
-			// 		   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
-			// 		   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-			// 		   		// $output .= '<img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png"'.$width.$height.'>';
-
-			// 		   		echo '<li'.$class.'><a href="'.$link.'"><img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png"'.$width.$height.'></a>';
-
-			// 		   		if($show_category_title)
-			// 		   		{
-			// 		   			echo '<a href="'.$link.'">'.$parent->name.'</a>';
-			// 		   		}
-
-			// 		   		echo '</li>';
-			// 		   	}
-			// 	}
-			// 	else
-			// 	{
-			// 		if(!$isproduct) echo '<li'.$class.'><a href="'.$link.'">'.$parent->name.'</a>'; //</li>';
-			// 	}
-
-				
-			// 	$level++;
-			// 		echo '<ul class="children level'.$level.'">';
-			// 		$level++;				
-			// }
-			// else
-			// { 
-				echo '<ul class="product-categories subcategories level'.$level.'">';
-				$level++;
-			// }
+					echo '</li>';
+				}
 
 			foreach($categories as $cat)
 			{
@@ -299,59 +304,54 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				else $class = '';
 
 				$link = get_term_link( $cat->slug, $cat->taxonomy );
-				echo '<li'.$class.'>'; //<a class="img" href="'.$link.'">';
+				echo '<li'.$class.'>';
 
 				if($show_category_thumbnail)
 				{
-					if(property_exists($cat, 'woocommerce_term_id')) $thumbnail_id = get_metadata( 'woocommerce_term', $cat->woocommerce_term_id, 'thumbnail_id', true );
-					else $thumbnail_id = get_metadata( 'woocommerce_term', $cat->term_id, 'thumbnail_id', true );;
-				
-					   	if ($thumbnail_id) 
-					   	{
-					   		// $image = wp_get_attachment_url( $thumbnail_id );
-					   		if($thumbnail_size)
-					   		{
-					   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
-					   			$image = $image[0];
-					   		}
-					   		else
-					   		{
-					   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
-					   			$image = $image[0];
-					   		}
+					echo '<a href="'.$link.'">';
 
-					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
-					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-					   		echo '<img src="'.$image.'"'.$width.$height.'>';
+					$this->get_thumbnail($cat);				   		
 
-					   	}
-					   	else
-					   	{
-					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
-					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-					   		echo '<img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png"'.$width.$height.'>';					   		
-					   	}
-				}
-				if($show_category_title)
-				{
-					echo '<a href="'.$link.'">'.$cat->name.'</a>';
-				}
-				if(!$show_category_title && !$show_category_thumbnail)
-				{
-					echo '<a href="'.$link.'">'.$cat->name.'</a>';
+					echo '</a>';
 				}
 				
-				if(!$hide_children_of_current_subcategory) $this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level, $thumb_width, $thumb_height);
+				if($show_category_title) echo '<a href="'.$link.'">'.$cat->name.'</a>';
+
+				if(!$show_category_title && !$show_category_thumbnail) echo '<a href="'.$link.'">'.$cat->name.'</a>';
+				
+				if(!$hide_children) $this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level);
 				
 				echo '</li>';
 			}
-			echo '</ul>';
 
-			// if($show_parent_category && !empty($parent)) echo '</li></ul>';
+			echo '</ul>';
 		}
 	}
 
-	function walk($cat , $show_category_thumbnail, $show_category_title, $level, $thumb_width = 0, $thumb_height  = 0)
+	function get_thumbnail($cat)
+	{
+		if(property_exists($cat, 'woocommerce_term_id')) $thumbnail_id = get_metadata( 'woocommerce_term', $cat->woocommerce_term_id, 'thumbnail_id', true );
+		else $thumbnail_id = get_metadata( 'woocommerce_term', $cat->term_id, 'thumbnail_id', true );;
+	
+	   	if ($thumbnail_id) 
+	   	{
+	   		if($thumbnail_size)
+	   		{
+	   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
+	   			$image = $image[0];
+	   		}
+	   		else
+	   		{
+	   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
+	   			$image = $image[0];
+	   		}
+	   		echo '<img src="'.$image.'">';
+
+	   	}
+	   	else echo '<img src="'.plugins_url().'/woocommerce/assets/images/placeholder.png">';	
+	}
+
+	function walk($cat , $show_category_thumbnail, $show_category_title, $level)
     {	
     	$args = array(
 				'hierarchical'       => 1,
@@ -362,62 +362,38 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			);
     	$next = get_categories($args);
 
-    	if( $next )
+    	if( $next && property_exists(get_queried_object(), 'slug'))
     	{
     		echo '<ul class="children level'.$level.'">';
     		$level++;
+
     		foreach ($next as $n)
     		{
     			if(get_queried_object()->slug == $n->slug) $class = ' class="current"';
 				else $class = '';
 
     			$link = get_term_link( $n->slug, $n->taxonomy );
-				$output = '<li'.$class.'><a href="'.$link.'">';
+				echo '<li'.$class.'>';
 
 				if($show_category_thumbnail)
 				{
-				$thumbnail_id = get_metadata( 'woocommerce_term', $n->woocommerce_term_id, 'thumbnail_id', true );
+					echo '<a href="'.$link.'">';
+
+					$this->get_thumbnail($n);				   		
+
+					echo '</a>';	   		
+				}
+
+				if($show_category_title) echo '<a href="'.$link.'">'.$n->name.'</a>';
 				
-					   	if ($thumbnail_id) 
-					   	{
-					   		// $image = wp_get_attachment_url( $thumbnail_id );
-					   		if($thumbnail_size)
-					   		{
-					   			$image = wp_get_attachment_image_src( $thumbnail_id, $thumbnail_size );
-					   			$image = $image[0];
-					   		}
-					   		else
-					   		{
-					   			$image = wp_get_attachment_image_src( $thumbnail_id, 'medium'  );
-					   			$image = $image[0];
-					   		}
+				if(!$show_category_title && !$show_category_thumbnail) echo '<a href="'.$link.'">'.$n->name.'</a>';
+				
+				echo '</li>';
 
-					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
-					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-					   		$output .= '<img src="'.$image.'"'.$width.$height.'>';
-					   		// <img src="<?php echo $image; >" />  		
-					   	}
-					   	else
-					   	{
-					   		if(isset($thumb_width) && $thumb_width > 0) $width = ' width="'.$thumb_width.'"';
-					   		if(isset($thumb_height) && $thumb_height > 0) $height = ' height="'.$thumb_height.'"';
-					   		$output .= '<img src="'.plugins_url().'/woocommerce//assets/images/placeholder.png"'.$width.$height.'>';					   		
-					   	}
-				}
-				if($show_category_title)
-				{
-					$output .= $n->name;
-				}
-				if(!$show_category_title && !$show_category_thumbnail)
-				{
-					$output .= $n->name;
-				}
-				$output .= '</a></li>';
-				echo $output;
-
-				$this->walk($n->term_id, $show_category_thumbnail, $show_category_title, $level, $thumb_width = 0, $thumb_height = 0);
+				$this->walk($n->term_id, $show_category_thumbnail, $show_category_title, $level);
 				
     		}
+    		
     		echo '</ul>';
     	}
     }
