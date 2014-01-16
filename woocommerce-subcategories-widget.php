@@ -282,7 +282,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				if($show_parent_category && !empty($parent) )
 				{
 					if(get_queried_object() && property_exists($wp_query->queried_object, 'slug') && $wp_query->queried_object->slug == $parent->slug) $class = ' class="parent current"';
-					else $class = 'parent';
+					else $class = ' class="parent"';
 
 					echo '<li'.$class.'>';
 
