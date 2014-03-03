@@ -166,7 +166,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		</p>
 		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_category_title') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_category_title') ); ?>"<?php checked( $show_category_title ); ?> />
-			<label for="<?php echo $this->get_field_id('show_category_title'); ?>"><?php _e( 'Show categories titles' ); ?></label>
+			<label for="<?php echo $this->get_field_id('show_category_title'); ?>"><?php _e( 'Show categories titles under thumbnails' ); ?></label>
 		</p>
 		<?php
 	}
@@ -362,7 +362,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			);
     	$next = get_categories($args);
 
-    	if( $next && property_exists(get_queried_object(), 'slug'))
+    	// if( $next && property_exists(get_queried_object(), 'slug'))
+    	if( $next )
     	{
     		echo '<ul class="children level'.$level.'">';
     		$level++;
