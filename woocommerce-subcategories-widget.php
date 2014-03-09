@@ -180,7 +180,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$isproduct = false;
 		$groundlevel = false;
 
-		if(isset($catslist) && !$show_active)
+		if(isset($catslist) && $show_active)
 		{
 			if(!preg_match('/[0-9]+/', $catslist)) $catslist = get_term_by( 'slug', $catslist, 'product_cat')->term_id;
 
@@ -196,7 +196,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				'taxonomy'           => 'product_cat'
 			);
 		}
-		elseif($show_active)
+		elseif(!$show_active)
 		{
 			$isproduct = false;
 
