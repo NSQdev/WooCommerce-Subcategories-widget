@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Subcategories widget
 Plugin URI: https://github.com/darkdelphin/WooCommerce-Subcategories-widget
 Description: Shows subcategories from chosen or current active category
-Version: 1.4.0
+Version: 1.4.1
 Author: Pavel Burov (Dark Delphin)
 Author URI: http://pavelburov.com
 */
@@ -31,6 +31,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$title = $instance['title'];
 		$show_active = $instance['show_active'];
 		$catslist = $instance['catslist'];
+		$hide_empty_cats = $instance['hide_empty_cats'];
 		$hide_children = $instance['hide_children'];
 		$show_parent_category = $instance['show_parent_category'];
 		$show_same_level = $instance['show_same_level'];
@@ -42,6 +43,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			'title' => $instance['title'],
 			'show_active' => $instance['show_active'],
 			'catslist' => $instance['catslist'],
+			'hide_empty_cats' => $instance['hide_empty_cats'],
 			'hide_children' => $instance['hide_children'],
 			'show_parent_category' => $instance['show_parent_category'],
 			'show_same_level' => $instance['show_same_level'],
@@ -66,6 +68,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['show_active'] = !empty($new_instance['show_active']) ? 1 : 0;
 		$instance['catslist'] = strip_tags($new_instance['catslist']);
+		$instance['hide_empty_cats'] = !empty($new_instance['hide_empty_cats']) ? 1 : 0;
 		$instance['hide_children'] = !empty($new_instance['hide_children']) ? 1 : 0;
 		$instance['show_parent_category'] = !empty($new_instance['show_parent_category']) ? 1 : 0;
 		$instance['show_same_level'] = !empty($new_instance['show_same_level']) ? 1 : 0;
@@ -83,6 +86,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$title = esc_attr( $instance['title'] );
 		$show_active = isset( $instance['show_active'] ) ? (bool) $instance['show_active'] : false;
 		$catslist = esc_attr( $instance['catslist'] );
+		$hide_empty_cats = isset( $instance['hide_empty_cats'] ) ? (bool) $instance['hide_empty_cats'] : false;
 		$hide_children = isset( $instance['hide_children'] ) ? (bool) $instance['hide_children'] : false;
 		$show_parent_category = isset( $instance['show_parent_category'] ) ? (bool) $instance['show_parent_category'] : false;
 		$show_same_level = isset( $instance['show_same_level'] ) ? (bool) $instance['show_same_level'] : false;
@@ -115,6 +119,10 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				}
 				?>
 			</select>
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('hide_empty_cats') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hide_empty_cats') ); ?>"<?php checked( $hide_empty_cats ); ?> />
+			<label for="<?php echo $this->get_field_id('hide_empty_cats'); ?>"><?php _e( 'Hide empty categories' ); ?></label>
 		</p>
 		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('hide_children') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hide_children') ); ?>"<?php checked( $hide_children ); ?> />
@@ -195,6 +203,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				'child_of'           => $catslist,
 				'taxonomy'           => 'product_cat'
 			);
+
+			if($hide_empty_cats) $args['hide_empty'] = 1;
 		}
 		elseif($show_active)
 		{
@@ -209,6 +219,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				'hide_empty'         => 0,
 				'taxonomy'           => 'product_cat'
 			);
+
+			if($hide_empty_cats) $args['hide_empty'] = 1;
 
 			$current_tax = get_query_var('product_cat'); // slug
 

@@ -2,6 +2,10 @@
 
 Plugin for listing product subcategories from selected parent category.
 
+#### Update 1.4.1
+
+* Hide empty categories option.
+
 #### Update 1.4.0
 
 * The whole plugin is rewritten from scratch.
