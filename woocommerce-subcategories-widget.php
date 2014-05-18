@@ -33,6 +33,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$catslist = $instance['catslist'];
 		$hide_empty_cats = $instance['hide_empty_cats'];
 		$hide_children = $instance['hide_children'];
+		$show_product_count = $instance['show_product_count'];
+		$show_product_count_brackets = $instance['show_product_count_brackets'];
 		$show_parent_category = $instance['show_parent_category'];
 		$show_same_level = $instance['show_same_level'];
 		$show_category_thumbnail = $instance['show_category_thumbnail'];
@@ -45,6 +47,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			'catslist' => $instance['catslist'],
 			'hide_empty_cats' => $instance['hide_empty_cats'],
 			'hide_children' => $instance['hide_children'],
+			'show_product_count' => $instance['show_product_count'],
+			'show_product_count_brackets' => $instance['show_product_count_brackets'],
 			'show_parent_category' => $instance['show_parent_category'],
 			'show_same_level' => $instance['show_same_level'],
 			'show_category_thumbnail' => $instance['show_category_thumbnail'],
@@ -70,6 +74,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$instance['catslist'] = strip_tags($new_instance['catslist']);
 		$instance['hide_empty_cats'] = !empty($new_instance['hide_empty_cats']) ? 1 : 0;
 		$instance['hide_children'] = !empty($new_instance['hide_children']) ? 1 : 0;
+		$instance['show_product_count'] = !empty($new_instance['show_product_count']) ? 1 : 0;
+		$instance['show_product_count_brackets'] = !empty($new_instance['show_product_count_brackets']) ? 1 : 0;
 		$instance['show_parent_category'] = !empty($new_instance['show_parent_category']) ? 1 : 0;
 		$instance['show_same_level'] = !empty($new_instance['show_same_level']) ? 1 : 0;
 		$instance['show_category_thumbnail'] = !empty($new_instance['show_category_thumbnail']) ? 1 : 0;
@@ -88,6 +94,8 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$catslist = esc_attr( $instance['catslist'] );
 		$hide_empty_cats = isset( $instance['hide_empty_cats'] ) ? (bool) $instance['hide_empty_cats'] : false;
 		$hide_children = isset( $instance['hide_children'] ) ? (bool) $instance['hide_children'] : false;
+		$show_product_count = isset( $instance['show_product_count'] ) ? (bool) $instance['show_product_count'] : false;
+		$show_product_count_brackets = isset( $instance['show_product_count_brackets'] ) ? (bool) $instance['show_product_count_brackets'] : false;
 		$show_parent_category = isset( $instance['show_parent_category'] ) ? (bool) $instance['show_parent_category'] : false;
 		$show_same_level = isset( $instance['show_same_level'] ) ? (bool) $instance['show_same_level'] : false;
 		$show_category_thumbnail = isset( $instance['show_category_thumbnail'] ) ? (bool) $instance['show_category_thumbnail'] : false;
@@ -127,6 +135,12 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('hide_children') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hide_children') ); ?>"<?php checked( $hide_children ); ?> />
 			<label for="<?php echo $this->get_field_id('hide_children'); ?>"><?php _e( 'Hide subcategories of deeper levels' ); ?></label>
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_product_count') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_product_count') ); ?>"<?php checked( $show_product_count ); ?> />
+			<label for="<?php echo $this->get_field_id('show_product_count'); ?>"><?php _e( 'Show product count' ); ?></label>
+			(<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_product_count_brackets') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_product_count_brackets') ); ?>"<?php checked( $show_product_count_brackets ); ?> />
+			<label for="<?php echo $this->get_field_id('show_product_count_brackets'); ?>"><?php _e( 'Show in brackets' ); ?></label>)
 		</p>
 		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_parent_category') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_parent_category') ); ?>"<?php checked( $show_parent_category ); ?> />
@@ -303,9 +317,16 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 						$this->get_thumbnail($parent);
 
 						if($show_category_title) echo '<a href="'.$link.'">'.$parent->name.'</a>';
+						if($show_product_count && $show_product_count_brackets) echo ' ('.$parent->count.')';
+						elseif($show_product_count) echo ' <span class="count">'.$parent->count.'</span>';
 
 					}
-					else if(!$isproduct) echo '<a href="'.$link.'">'.$parent->name.'</a>';
+					else if(!$isproduct)
+					{
+						echo '<a href="'.$link.'">'.$parent->name.'</a>';
+						if($show_product_count && $show_product_count_brackets) echo ' ('.$parent->count.')';
+						elseif($show_product_count) echo ' <span class="count">'.$parent->count.'</span>';
+					} 
 
 					echo '</li>';
 				}
@@ -330,7 +351,10 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				if($show_category_title) echo '<a href="'.$link.'">'.$cat->name.'</a>';
 
 				if(!$show_category_title && !$show_category_thumbnail) echo '<a href="'.$link.'">'.$cat->name.'</a>';
-				
+
+				if($show_product_count && $show_product_count_brackets) echo ' ('.$cat->count.')';
+				elseif($show_product_count) echo ' <span class="count">'.$cat->count.'</span>';
+
 				if(!$hide_children) $this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level);
 				
 				echo '</li>';
@@ -400,6 +424,9 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				if($show_category_title) echo '<a href="'.$link.'">'.$n->name.'</a>';
 				
 				if(!$show_category_title && !$show_category_thumbnail) echo '<a href="'.$link.'">'.$n->name.'</a>';
+
+				if($show_product_count && $show_product_count_brackets) echo ' ('.$n->count.')';
+				elseif($show_product_count) echo ' <span class="count">'.$n->count.'</span>';
 				
 				echo '</li>';
 

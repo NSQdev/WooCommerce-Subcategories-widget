@@ -2,6 +2,11 @@
 
 Plugin for listing product subcategories from selected parent category.
 
+#### Update 1.4.2
+
+* Show product count option.
+* By default it is wrapped in span tag with a class "count" in case you need to style it separately with CSS. If you simply need default visual output with brackets - choose sub-option "Show in brackets", it will replace span with brackets and make code more clean. 
+
 #### Update 1.4.1
 
 * Hide empty categories option.
