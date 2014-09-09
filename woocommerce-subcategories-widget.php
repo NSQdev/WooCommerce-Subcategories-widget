@@ -16,7 +16,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 	function Woocommerce_subcategories_widget() {
 
 		$params = array(
-			'classname' => 'woocommerce_subcategories_widget',
+                    'classname' => 'woocommerce_subcategories_widget',
 		    'description' => 'Shows subcategories of chosen category' // plugin description that is showed in Widget section of admin panel
 		);
 
@@ -25,23 +25,9 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 	}
 
 	function widget( $args, $instance ) {
+                
 
-		extract( $args );
-
-		$title = $instance['title'];
-		$show_active = $instance['show_active'];
-		$catslist = $instance['catslist'];
-		$hide_empty_cats = $instance['hide_empty_cats'];
-		$hide_children = $instance['hide_children'];
-		$show_product_count = $instance['show_product_count'];
-		$show_product_count_brackets = $instance['show_product_count_brackets'];
-		$show_parent_category = $instance['show_parent_category'];
-		$show_same_level = $instance['show_same_level'];
-		$show_category_thumbnail = $instance['show_category_thumbnail'];
-		$thumbnail_size = $instance['thumbnail_size'];
-		$show_category_title = $instance['show_category_title'];
-
-		$input = array(
+                $input = array(
 			'title' => $instance['title'],
 			'show_active' => $instance['show_active'],
 			'catslist' => $instance['catslist'],
@@ -443,6 +429,3 @@ function woocommerce_subcategories_widget_register() {
     register_widget('woocommerce_subcategories_widget');
 }
 add_action('widgets_init', 'woocommerce_subcategories_widget_register');
-
-
-?>
