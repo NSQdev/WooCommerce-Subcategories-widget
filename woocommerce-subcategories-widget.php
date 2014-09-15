@@ -16,7 +16,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 	function Woocommerce_subcategories_widget() {
 
 		$params = array(
-			'classname' => 'woocommerce_subcategories_widget',
+                    'classname' => 'woocommerce_subcategories_widget',
 		    'description' => 'Shows subcategories of chosen category' // plugin description that is showed in Widget section of admin panel
 		);
 
@@ -25,23 +25,9 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 	}
 
 	function widget( $args, $instance ) {
+                
 
-		extract( $args );
-
-		$title = $instance['title'];
-		$show_active = $instance['show_active'];
-		$catslist = $instance['catslist'];
-		$hide_empty_cats = $instance['hide_empty_cats'];
-		$hide_children = $instance['hide_children'];
-		$show_product_count = $instance['show_product_count'];
-		$show_product_count_brackets = $instance['show_product_count_brackets'];
-		$show_parent_category = $instance['show_parent_category'];
-		$show_same_level = $instance['show_same_level'];
-		$show_category_thumbnail = $instance['show_category_thumbnail'];
-		$thumbnail_size = $instance['thumbnail_size'];
-		$show_category_title = $instance['show_category_title'];
-
-		$input = array(
+                $input = array(
 			'title' => $instance['title'],
 			'show_active' => $instance['show_active'],
 			'catslist' => $instance['catslist'],
@@ -53,16 +39,27 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			'show_same_level' => $instance['show_same_level'],
 			'show_category_thumbnail' => $instance['show_category_thumbnail'],
 			'thumbnail_size' => $instance['thumbnail_size'],
-			'show_category_title' => $instance['show_category_title']
+			'show_category_title' => $instance['show_category_title'],
+                        'hide_title' => $instance['hide_title']
 			);
 
-		echo $before_widget;
 
-		if ( $title ) echo $before_title . $title . $after_title;
+                if(!$instance['hide_title']){
+                    extract($args);
+                    echo $before_widget;
 
-		$this->get_categories($input);
+                    if ($instance['title']){
+                        echo $before_title . $instance['title'] . $after_title;
+                    }
 
-		echo $after_widget;
+                    $this->get_categories($input, $args);
+
+                    echo $after_widget;                    
+                } else {
+                    $this->get_categories($input, $args);                    
+                }
+                
+
 	}
 
 	function update( $new_instance, $old_instance ) {
@@ -81,6 +78,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$instance['show_category_thumbnail'] = !empty($new_instance['show_category_thumbnail']) ? 1 : 0;
 		$instance['thumbnail_size'] = strip_tags($new_instance['thumbnail_size']);
 		$instance['show_category_title'] = !empty($new_instance['show_category_title']) ? 1 : 0;
+		$instance['hide_title'] = !empty($new_instance['hide_title']) ? 1 : 0;
 
 		return $instance;
 	}
@@ -101,6 +99,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$show_category_thumbnail = isset( $instance['show_category_thumbnail'] ) ? (bool) $instance['show_category_thumbnail'] : false;
 		$thumbnail_size = esc_attr( $instance['thumbnail_size'] );
 		$show_category_title = isset( $instance['show_category_title'] ) ? (bool) $instance['show_category_title'] : false;
+		$hide_title = isset( $instance['hide_title'] ) ? (bool) $instance['hide_title'] : false;
 
 		$taxlist = get_terms('product_cat', 'hide_empty=0');
 		?>
@@ -108,6 +107,10 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id('title') ); ?>" name="<?php echo esc_attr( $this->get_field_name('title') ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('hide_title') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hide_title') ); ?>"<?php checked( $hide_title ); ?> />
+			<label for="<?php echo $this->get_field_id('hide_title'); ?>"><?php _e( 'Hide Title if no categories found' ); ?></label>
+		</p>                
 		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('show_active') ); ?>" name="<?php echo esc_attr( $this->get_field_name('show_active') ); ?>"<?php checked( $show_active ); ?> />
 			<label for="<?php echo $this->get_field_id('show_active'); ?>"><?php _e( 'Show subcategories of current active category' ); ?></label>
@@ -193,11 +196,12 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		<?php
 	}
 
-	function get_categories($input) {
+	function get_categories($input, $args) {
 
 		global $wp_query, $post, $woocommerce;
 
 		extract( $input );
+                extract( $args );                       
 
 		$isproduct = false;
 		$groundlevel = false;
@@ -276,8 +280,18 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		else $categories = get_categories( $args );
 		// -------
 
-		if(!empty($categories))
-		{
+		if(!empty($categories)){
+                    
+                    if($hide_title){
+                        
+                        echo $before_widget;
+                        
+                        if ($title) {
+                            echo $before_title . $title . $after_title;                            
+                        }                        
+                    }
+                    
+                    
 			if($show_active)
 			{
 				if($groundlevel)
@@ -361,6 +375,11 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			}
 
 			echo '</ul>';
+                        
+                    if($hide_title){
+                        echo $after_widget;
+                    }                        
+                        
 		}
 	}
 
@@ -443,6 +462,3 @@ function woocommerce_subcategories_widget_register() {
     register_widget('woocommerce_subcategories_widget');
 }
 add_action('widgets_init', 'woocommerce_subcategories_widget_register');
-
-
-?>
