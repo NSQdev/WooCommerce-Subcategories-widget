@@ -82,7 +82,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		$thumbnail_size = esc_attr( $instance['thumbnail_size'] );
 		$show_category_title = isset( $instance['show_category_title'] ) ? (bool) $instance['show_category_title'] : false;
 
-		$taxlist = get_terms('product_cat', 'hide_empty=0');
+		
 		?>
 		<p>
 			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title' ); ?></label>
@@ -98,13 +98,27 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		<p>
 			<select class="widefat" id="<?php echo $this->get_field_id('catslist'); ?>" name="<?php echo $this->get_field_name('catslist'); ?>">
 				<?php
-				foreach ($taxlist as $tax) 
+				$all_tax = get_transient('woocommerce_subcategories_all_tax');
+
+				if(empty($all_tax))
 				{
-					if(get_term_children( $tax->term_id, 'product_cat' )) 
+					$taxlist = get_terms('product_cat', 'hide_empty=0');
+
+					ob_start();
+					foreach ($taxlist as $tax) 
 					{
-						echo '<option value="'.$tax->term_id.'" '.selected($catslist, $tax->term_id).'>'.$tax->name.'</option>';						
+						if(get_term_children( $tax->term_id, 'product_cat' )) 
+						{
+							echo '<option value="'.$tax->term_id.'" '.selected($catslist, $tax->term_id).'>'.$tax->name.'</option>';						
+						}
 					}
+					$output = ob_get_clean();
+					set_transient('woocommerce_subcategories_all_tax', $output, 60*60*24);
+
+					echo $output;
 				}
+				else echo $all_tax;
+				
 				?>
 			</select>
 		</p>
@@ -255,17 +269,14 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 		// Here we get all categories
 		if($isproduct) $categories = get_the_terms( get_the_ID(), 'product_cat' );
 		else $categories = get_categories( $args );
-		// -------
 
-		if(!empty($categories)){
-                    
-                        
+		if(!empty($categories))
+		{
             echo $before_widget;
             
             if ($title) {
                 echo $before_title . $title . $after_title;                            
             }                        
-                    
                     
 			if($show_active)
 			{
@@ -351,8 +362,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 
 			echo '</ul>';
                         
-            echo $after_widget;
-                        
+            echo $after_widget;                
 		}
 	}
 
