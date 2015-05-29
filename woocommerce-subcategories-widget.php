@@ -96,6 +96,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 			<?php echo __('Or choose permanent category below:') ?>
 		</p>
 		<p>
+			<input type="hidden" id="<?php echo $this->get_field_id('catslist'); ?>-selected" value="<?php echo $catslist; ?>"> 
 			<select class="widefat" id="<?php echo $this->get_field_id('catslist'); ?>" name="<?php echo $this->get_field_name('catslist'); ?>">
 				<?php
 				$all_tax = get_transient('woocommerce_subcategories_all_tax');
@@ -109,7 +110,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 					{
 						if(get_term_children( $tax->term_id, 'product_cat' )) 
 						{
-							echo '<option value="'.$tax->term_id.'" '.selected($catslist, $tax->term_id).'>'.$tax->name.'</option>';						
+							echo '<option value="'.$tax->term_id.'">'.$tax->name.'</option>';						
 						}
 					}
 					$output = ob_get_clean();
@@ -118,9 +119,11 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 					echo $output;
 				}
 				else echo $all_tax;
-				
 				?>
 			</select>
+			<script>
+				console.log( document.querySelector('#<?php echo $this->get_field_id("catslist"); ?>').value = document.querySelector('#<?php echo $this->get_field_id("catslist"); ?>-selected').value );
+			</script>
 		</p>
 		<p>
 			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id('hide_empty_cats') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hide_empty_cats') ); ?>"<?php checked( $hide_empty_cats ); ?> />
