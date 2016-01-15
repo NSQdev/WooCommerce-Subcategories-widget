@@ -358,6 +358,17 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 				if($show_product_count && $show_product_count_brackets) echo ' ('.$cat->count.')';
 				elseif($show_product_count) echo ' <span class="count">'.$cat->count.'</span>';
 
+				$args = array(
+						'hierarchical'       => 1,
+						'show_option_none'   => '',
+						'hide_empty'         => 0,
+						'parent'			 => $cat->term_id,
+						'taxonomy'           => 'product_cat'
+					);
+
+		    	$next = get_categories($args);
+		    	if($next) echo '<span class="toggle"></span>';
+
 				if(!$hide_children) $this->walk($cat->term_id, $show_category_thumbnail, $show_category_title, $level);
 				
 				echo '</li>';
@@ -365,7 +376,7 @@ class Woocommerce_subcategories_widget extends WP_Widget {
 
 			echo '</ul>';
                         
-            echo $after_widget;                
+            echo $after_widget; 
 		}
 	}
 
